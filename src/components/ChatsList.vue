@@ -1,5 +1,5 @@
 <template>
-  <ChatItem v-for="chat in chatsList" :key="chat.id" />
+  <ChatItem v-for="chat in chatsList" :key="chat.id" :currentChat="chat" />
 </template>
 
 <script setup>

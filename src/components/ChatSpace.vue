@@ -25,10 +25,15 @@
 </template>
 
 <script setup>
-import { inject, ref } from "vue";
+import { computed, inject, ref } from "vue";
 import MessagesList from "./MessagesList.vue";
 import { useMutation } from "@vue/apollo-composable";
 import { createMessage } from "../graphql-operations/mutations";
+import { useStore } from "vuex";
+
+const store = useStore();
+
+const currentChat = computed(() => store.getters["chat/GET_CURRENT_CHAT"]);
 
 const messages = inject("messages");
 const currentSessionMessages = ref([]);
