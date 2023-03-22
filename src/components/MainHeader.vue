@@ -12,7 +12,7 @@
 
       <div>
         <q-item id="auth-links">
-          <q-btn> Войти </q-btn>
+          <q-btn @click="userApi.login"> Войти </q-btn>
         </q-item>
 
         <div class="q-ml-md">
@@ -25,6 +25,7 @@
 
 <script setup>
 import { inject } from "vue";
+import userApi from "../sdk/user";
 
 const toggleLeftDrawer = inject("toggleLeftDrawer");
 </script>
