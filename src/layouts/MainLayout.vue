@@ -28,6 +28,8 @@ import MainDrawer from "src/components/MainDrawer.vue";
 const leftDrawerOpen = ref(false);
 const rightDrawerOpen = ref(false);
 
+const messages = ref([]);
+
 const toggleLeftDrawer = () => {
   leftDrawerOpen.value = !leftDrawerOpen.value;
 };
@@ -41,10 +43,18 @@ provide("toggleLeftDrawer", toggleLeftDrawer);
 onMounted(() => {
   const onMessage = (message) => {
     const user = window.Clerk.user;
+
+    if (message.headers.to === user.id) {
+      messages.value.push(JSON.parse(message.body));
+    }
   };
 
-  // stompClient.connect("user1", "user1", onConnect, (error) =>
-  //   console.log(error)
-  // );
+  const onConnect = () => {
+    stompClient.subscribe("/queue/chat", onMessage);
+  };
+
+  stompClient.connect("user1", "user1", onConnect, (error) =>
+    console.log(error)
+  );
 });
 </script>
