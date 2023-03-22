@@ -1,8 +1,6 @@
 <template>
   <q-drawer v-model="leftDrawerOpen" :side="side" show-if-above bordered>
-    <q-list>
-      <q-item-label header>{{ title }}</q-item-label>
-    </q-list>
+    <slot name="list">Список пуст</slot>
   </q-drawer>
 </template>
 

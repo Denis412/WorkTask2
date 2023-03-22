@@ -2,7 +2,9 @@ const login = () => {
   window.Clerk.openSignIn();
 };
 
-const registration = () => {};
+const registration = () => {
+  window.Clerk.openSignUp();
+};
 
 const userApi = { login, registration };
 

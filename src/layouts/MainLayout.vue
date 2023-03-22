@@ -2,12 +2,21 @@
   <q-layout view="hHh Lpr lFf">
     <MainHeader />
 
-    <MainDrawer side="left" title="Список чатов" v-model="leftDrawerOpen" />
+    <MainDrawer side="left" title="Список чатов" v-model="leftDrawerOpen">
+      <template #list>
+        <ChatsList />
+      </template>
+    </MainDrawer>
+
     <MainDrawer
       side="right"
       title="Список пользователей"
       v-model="rightDrawerOpen"
-    />
+    >
+      <template #list>
+        <UsersList />
+      </template>
+    </MainDrawer>
 
     <q-page-container>
       <router-view v-slot="{ Component }">
@@ -24,6 +33,8 @@ import { onMounted, provide, ref } from "vue";
 import stompClient from "../lib/stompClient";
 import MainHeader from "src/components/MainHeader.vue";
 import MainDrawer from "src/components/MainDrawer.vue";
+import ChatsList from "src/components/ChatsList.vue";
+import UsersList from "src/components/UsersList.vue";
 
 const leftDrawerOpen = ref(false);
 const rightDrawerOpen = ref(false);
