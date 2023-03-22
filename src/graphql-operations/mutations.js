@@ -1,9 +1,19 @@
 import gql from "graphql-tag";
 
 export const createUser = gql`
-  mutation createUser($id: String, $first_name: String, $email: String) {
+  mutation createUser(
+    $id: String
+    $first_name: String
+    $email: String
+    $avatar_url: String!
+  ) {
     insert_users_one(
-      object: { id: $id, first_name: $first_name, email: $email }
+      object: {
+        id: $id
+        first_name: $first_name
+        email: $email
+        avatar_url: $avatar_url
+      }
     ) {
       id
     }

@@ -1,18 +1,12 @@
 import gql from "graphql-tag";
 
-export const getLastMessageInTheChat = gql`
-  query getLastMessageInTheChat($chat_id: Int) {
-    chats(where: { id: { _eq: $chat_id } }) {
-      messages(order_by: { created_at: desc }, limit: 1) {
-        id
-        senderId
-        senderDisplayName
-        senderAvatarUrl
-        created_at
-        content
-        consumerId
-        chat_id
-      }
+export const getUsers = gql`
+  query getUsers {
+    users {
+      id
+      first_name
+      email
+      avatar_url
     }
   }
 `;

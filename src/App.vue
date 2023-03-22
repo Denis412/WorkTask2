@@ -57,6 +57,7 @@ const startClerk = async () => {
         id: Clerk.user.id,
         first_name: Clerk.user.firstName,
         email: Clerk.user.primaryEmailAddress.emailAddress,
+        avatar_url: Clerk.user.profileImageUrl,
       });
     }
   } catch (err) {

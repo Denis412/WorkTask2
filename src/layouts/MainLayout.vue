@@ -14,7 +14,7 @@
       v-model="rightDrawerOpen"
     >
       <template #list>
-        <UsersList :users-list="users" class="q-mt-md" />
+        <UsersList :users-list="users?.users" class="q-mt-md" />
       </template>
     </MainDrawer>
 
@@ -41,11 +41,13 @@ import {
   useQuery,
 } from "@vue/apollo-composable";
 import { useStore } from "vuex";
-import { getUserById } from "../graphql-operations/query";
+import { getUsers } from "../graphql-operations/query";
 import { createUser } from "../graphql-operations/mutations";
 import { tSBigIntKeyword } from "@babel/types";
 
 provideApolloClient(apolloClient);
+
+const { result: users } = useQuery(getUsers);
 
 const store = useStore();
 
@@ -74,18 +76,18 @@ const chats = ref([
     consumer_firstName: "Alexey",
   },
 ]);
-const users = ref([
-  {
-    id: 1,
-    avatarUrl: "gg",
-    firstName: "Danil",
-  },
-  {
-    id: 2,
-    avatarUrl: "gg",
-    firstName: "Alexey",
-  },
-]);
+// const users = ref([
+//   {
+//     id: 1,
+//     avatarUrl: "gg",
+//     firstName: "Danil",
+//   },
+//   {
+//     id: 2,
+//     avatarUrl: "gg",
+//     firstName: "Alexey",
+//   },
+// ]);
 const messages = ref([]);
 
 const toggleLeftDrawer = () => {
