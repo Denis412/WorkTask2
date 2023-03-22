@@ -1,24 +1,45 @@
-import { createHttpLink, InMemoryCache } from "@apollo/client/core";
+import { createHttpLink, InMemoryCache, split } from "@apollo/client/core";
+import { getMainDefinition } from "apollo-utilities";
+import { setContext } from "@apollo/client/link/context";
+import { WebSocketLink } from "@apollo/client/link/ws";
+
 export function getClientOptions(options) {
+  // const token = sessionStorage.getItem("token");
+
   const httpLink = createHttpLink({
     uri: "https://knowing-pegasus-94.hasura.app/v1/graphql",
+    // headers: {
+    //   Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+    // },
   });
 
-  const authLink = setContext((_, { headers }) => {
-    const token = sessionStorage.getItem("token");
-
-    return {
-      headers: {
-        ...headers,
-        Authorization: token ? `Bearer ${token}` : "",
-      },
-    };
+  const wsLink = new WebSocketLink({
+    uri: "wss://knowing-pegasus-94.hasura.app/v1/graphql",
+    options: {
+      // reconnect: true,
+      // connectionParams: {
+      //   headers: {
+      //     Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+      //   },
+      // },
+    },
   });
+
+  const link = split(
+    // split based on operation type
+    ({ query }) => {
+      const { kind, operation } = getMainDefinition(query);
+      return kind === "OperationDefinition" && operation === "subscription";
+    },
+    wsLink,
+    httpLink
+  );
 
   return Object.assign(
     {
-      link: authLink.concat(httpLink),
+      link: link,
       cache: new InMemoryCache(),
+      connectToDevTools: true,
     },
     // Specific Quasar mode options.
     process.env.MODE === "spa"

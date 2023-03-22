@@ -30,17 +30,25 @@
 
 <script setup>
 import { onMounted, provide, ref } from "vue";
-import stompClient from "../lib/stompClient";
-import clerk from "@clerk/clerk-sdk-node";
-import Clerk from "@clerk/clerk-sdk-node/esm/instance";
 import MainHeader from "src/components/MainHeader.vue";
 import MainDrawer from "src/components/MainDrawer.vue";
 import ChatsList from "src/components/ChatsList.vue";
 import UsersList from "src/components/UsersList.vue";
+import apolloClient from "../apollo/apollo-client";
+
+import {
+  provideApolloClient,
+  useQuery,
+  useSubscription,
+} from "@vue/apollo-composable";
+import gql from "graphql-tag";
 
 const leftDrawerOpen = ref(false);
 const rightDrawerOpen = ref(false);
 
+provideApolloClient(apolloClient);
+
+const chats = ref([]);
 const messages = ref([]);
 
 const toggleLeftDrawer = () => {
@@ -51,23 +59,8 @@ const toggleRightDrawer = () => {
   rightDrawerOpen.value = !rightDrawerOpen.value;
 };
 
+provide("messages", messages);
 provide("toggleLeftDrawer", toggleLeftDrawer);
 
-onMounted(async () => {
-  const onMessage = (message) => {
-    const user = window.Clerk.user;
-
-    if (message.headers.to === user.id) {
-      messages.value.push(JSON.parse(message.body));
-    }
-  };
-
-  const onConnect = () => {
-    stompClient.subscribe("/queue/chat", onMessage);
-  };
-
-  stompClient.connect("user1", "user1", onConnect, (error) =>
-    console.log(error)
-  );
-});
+onMounted(async () => {});
 </script>

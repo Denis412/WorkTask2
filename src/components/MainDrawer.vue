@@ -1,5 +1,5 @@
 <template>
-  <q-drawer v-model="leftDrawerOpen" :side="side" show-if-above bordered>
+  <q-drawer :side="side" show-if-above bordered>
     <slot name="list">Список пуст</slot>
   </q-drawer>
 </template>
