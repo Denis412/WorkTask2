@@ -1,8 +1,8 @@
 <template>
   <div class="flex column relative">
-    <div style="overflow-y: auto; max-height: 600px">
-      <MessagesList :messages="currentSessionMessages" />
-    </div>
+    <ChatHeader title="Danil" avatarUrl="ava" />
+
+    <MessagesList :messages="currentMessages?.messages" />
 
     <q-form class="form-send absolute flex items-center">
       <div class="form-controls q-ml-md">
@@ -25,18 +25,31 @@
 </template>
 
 <script setup>
-import { computed, inject, ref } from "vue";
+import { computed, inject, ref, watch } from "vue";
 import MessagesList from "./MessagesList.vue";
-import { useMutation } from "@vue/apollo-composable";
+import { useMutation, useQuery, useSubscription } from "@vue/apollo-composable";
 import { createMessage } from "../graphql-operations/mutations";
 import { useStore } from "vuex";
+import { getSavedMessagesInThisChat } from "../graphql-operations/query";
+import ChatHeader from "./ChatHeader.vue";
 
 const store = useStore();
 
 const currentChat = computed(() => store.getters["chat/GET_CURRENT_CHAT"]);
 
-const messages = inject("messages");
-const currentSessionMessages = ref([]);
+const {
+  result: currentMessages,
+  loading,
+  refetch,
+} = useQuery(getSavedMessagesInThisChat, {
+  chat_id: currentChat.value,
+});
+
+watch(currentChat, (value) => {
+  refetch({
+    chat_id: currentChat.value,
+  });
+});
 
 const { mutate: createdMessage } = useMutation(createMessage);
 
@@ -45,22 +58,17 @@ const message = ref("");
 const sendMessage = async () => {
   const user = window.Clerk.user;
 
-  const createdTime = new Date();
-
-  const hours = createdTime.getHours();
-  const minutes = createdTime.getMinutes();
-
   const currentMessage = {
     senderId: user.id,
     consumerId: "baba",
     senderDisplayName: user.firstName,
     senderAvatarUrl: user.profileImageUrl,
     content: message.value,
-    created_at: `${hours}:${minutes}`,
+    created_at: Date.now(),
     chat_id: 12,
   };
 
-  currentSessionMessages.value.push(currentMessage);
+  currentMessages.value?.messages.push(currentMessage);
 
   message.value = "";
 
@@ -72,6 +80,25 @@ const sendMessage = async () => {
     console.log(error);
   }
 };
+
+watch(
+  () => currentChat,
+  (oldVal, newVal) => {
+    subscribeToMore(
+      getSavedMessagesInThisChat,
+      {
+        newVal,
+      },
+      (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+        const newMessage = subscriptionData.data.messageAdded;
+        return {
+          messages: [...prev.messages, newMessage],
+        };
+      }
+    );
+  }
+);
 </script>
 
 <style lang="scss">
