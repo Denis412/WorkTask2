@@ -8,7 +8,7 @@
 
 <script setup>
 import { provideApolloClient, useMutation } from "@vue/apollo-composable";
-import { computed, onMounted, watch } from "vue";
+import { computed, onMounted, provide, watch } from "vue";
 import { createUser } from "./graphql-operations/mutations";
 import apolloClient from "./apollo/apollo-client";
 

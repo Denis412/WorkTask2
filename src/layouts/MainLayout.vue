@@ -4,7 +4,7 @@
 
     <MainDrawer side="left" title="Список чатов" v-model="leftDrawerOpen">
       <template #list>
-        <ChatsList :chats-list="chats" class="q-mt-md" />
+        <ChatsList :chats-list="chats?.chats" class="q-mt-md" />
       </template>
     </MainDrawer>
 
@@ -19,6 +19,8 @@
     </MainDrawer>
 
     <q-page-container>
+      <!-- <pre>{{ chats }}</pre>
+      <pre>{{ chatsA }}</pre> -->
       <router-view v-slot="{ Component }">
         <keep-alive>
           <component :is="Component" />
@@ -29,7 +31,15 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onUpdated, provide, ref, watch } from "vue";
+import {
+  computed,
+  inject,
+  onMounted,
+  onUpdated,
+  provide,
+  ref,
+  watch,
+} from "vue";
 import MainHeader from "src/components/MainHeader.vue";
 import MainDrawer from "src/components/MainDrawer.vue";
 import ChatsList from "src/components/ChatsList.vue";
@@ -39,15 +49,27 @@ import {
   provideApolloClient,
   useMutation,
   useQuery,
+  useSubscription,
 } from "@vue/apollo-composable";
 import { useStore } from "vuex";
-import { getUsers } from "../graphql-operations/query";
+import {
+  getUsers,
+  getAllChatsSenderForCurrentUser,
+  getAllChatsConsumerForCurrentUser,
+} from "../graphql-operations/subscriptions";
 import { createUser } from "../graphql-operations/mutations";
 import { tSBigIntKeyword } from "@babel/types";
 
 provideApolloClient(apolloClient);
 
-const { result: users } = useQuery(getUsers);
+const { result: users } = useSubscription(getUsers);
+const { result: chats } = useSubscription(getAllChatsSenderForCurrentUser, {
+  user_id: "user_2NNbz4bcHzNK5Ke20UIqhOBbLMh",
+});
+
+const { result: chatsA } = useSubscription(getAllChatsConsumerForCurrentUser, {
+  user_id: "user_2NNbz4bcHzNK5Ke20UIqhOBbLMh",
+});
 
 const store = useStore();
 
@@ -56,38 +78,27 @@ const rightDrawerOpen = ref(false);
 
 provideApolloClient(apolloClient);
 
-const chats = ref([
-  {
-    id: 12,
-    sender_id: "user_2NNDSNxio14fOwWraMxRaJqKTT5",
-    consumer_id: "baba",
-    sender_avatar: "ghgh",
-    sender_firstName: "Danil",
-    consumer_avatar: "ghgh",
-    consumer_firstName: "Danil",
-  },
-  {
-    id: 13,
-    sender_id: "user_2NNDSNxio14fOwWraMxRaJqKTT5",
-    consumer_id: "baba",
-    sender_avatar: "ghgh",
-    sender_firstName: "Alexey",
-    consumer_avatar: "ghgh",
-    consumer_firstName: "Alexey",
-  },
-]);
-// const users = ref([
+// const chats = ref([
 //   {
-//     id: 1,
-//     avatarUrl: "gg",
-//     firstName: "Danil",
+//     id: 12,
+//     sender_id: "user_2NNDSNxio14fOwWraMxRaJqKTT5",
+//     consumer_id: "baba",
+//     sender_avatar: "ghgh",
+//     sender_firstName: "Danil",
+//     consumer_avatar: "ghgh",
+//     consumer_firstName: "Danil",
 //   },
 //   {
-//     id: 2,
-//     avatarUrl: "gg",
-//     firstName: "Alexey",
+//     id: 13,
+//     sender_id: "user_2NNDSNxio14fOwWraMxRaJqKTT5",
+//     consumer_id: "baba",
+//     sender_avatar: "ghgh",
+//     sender_firstName: "Alexey",
+//     consumer_avatar: "ghgh",
+//     consumer_firstName: "Alexey",
 //   },
 // ]);
+
 const messages = ref([]);
 
 const toggleLeftDrawer = () => {
