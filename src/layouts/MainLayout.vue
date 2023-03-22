@@ -43,6 +43,9 @@ import {
 import { useStore } from "vuex";
 import { getUserById } from "../graphql-operations/query";
 import { createUser } from "../graphql-operations/mutations";
+import { tSBigIntKeyword } from "@babel/types";
+
+provideApolloClient(apolloClient);
 
 const store = useStore();
 
@@ -83,7 +86,6 @@ const users = ref([
     firstName: "Alexey",
   },
 ]);
-
 const messages = ref([]);
 
 const toggleLeftDrawer = () => {

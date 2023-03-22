@@ -23,7 +23,7 @@ const { messages } = defineProps({
   messages: Array,
 });
 
-const checkSender = (user_id) => userApi.get().id === user_id;
+const checkSender = (user_id) => userApi.get()?.id === user_id;
 
 const calculateTime = (created_at) => {
   const createdDate = new Date(created_at);
