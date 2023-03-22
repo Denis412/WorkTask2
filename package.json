@@ -9,8 +9,12 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
+    "@clerk/clerk-js": "^4.32.6",
+    "@clerk/clerk-sdk-node": "^4.7.16",
     "@quasar/extras": "^1.0.0",
+    "@vue/apollo-composable": "^4.0.0-beta.4",
     "axios": "^1.2.1",
+    "graphql-subscriptions": "^2.0.0",
     "quasar": "^2.6.0",
     "stompjs": "^2.3.3",
     "vue": "^3.0.0",
@@ -19,6 +23,7 @@
   },
   "devDependencies": {
     "@quasar/app-vite": "^1.0.0",
+    "@quasar/quasar-app-extension-apollo": "^2.0.0-beta.5",
     "autoprefixer": "^10.4.2",
     "postcss": "^8.4.14"
   },

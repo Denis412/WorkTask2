@@ -31,6 +31,8 @@
 <script setup>
 import { onMounted, provide, ref } from "vue";
 import stompClient from "../lib/stompClient";
+import clerk from "@clerk/clerk-sdk-node";
+import Clerk from "@clerk/clerk-sdk-node/esm/instance";
 import MainHeader from "src/components/MainHeader.vue";
 import MainDrawer from "src/components/MainDrawer.vue";
 import ChatsList from "src/components/ChatsList.vue";
@@ -51,7 +53,7 @@ const toggleRightDrawer = () => {
 
 provide("toggleLeftDrawer", toggleLeftDrawer);
 
-onMounted(() => {
+onMounted(async () => {
   const onMessage = (message) => {
     const user = window.Clerk.user;
 
