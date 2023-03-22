@@ -3,19 +3,99 @@
   <head>
     <title><%= productName %></title>
 
-    <meta charset="utf-8">
-    <meta name="description" content="<%= productDescription %>">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="msapplication-tap-highlight" content="no">
-    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width<% if (ctx.mode.cordova || ctx.mode.capacitor) { %>, viewport-fit=cover<% } %>">
+    <meta charset="utf-8" />
+    <meta name="description" content="<%= productDescription %>" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta
+      name="viewport"
+      content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width<% if (ctx.mode.cordova || ctx.mode.capacitor) { %>, viewport-fit=cover<% } %>"
+    />
 
-    <link rel="icon" type="image/png" sizes="128x128" href="icons/favicon-128x128.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="icons/favicon-96x96.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16x16.png">
-    <link rel="icon" type="image/ico" href="favicon.ico">
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="128x128"
+      href="icons/favicon-128x128.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="96x96"
+      href="icons/favicon-96x96.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="icons/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="icons/favicon-16x16.png"
+    />
+    <link rel="icon" type="image/ico" href="favicon.ico" />
   </head>
   <body>
     <!-- quasar:entry-point -->
+
+    <script>
+      const publishableKey =
+        "pk_test_c3Ryb25nLWNhbWVsLTQzLmNsZXJrLmFjY291bnRzLmRldiQ"; // <- Add Publishable Key here
+
+      const startClerk = async () => {
+        const Clerk = window.Clerk;
+
+        try {
+          // Load Clerk environment and session if available
+          await Clerk.load();
+
+          const userButton = document.getElementById("user-button");
+          const authLinks = document.getElementById("auth-links");
+
+          Clerk.addListener(({ user }) => {
+            // Display links conditionally based on user state
+            authLinks.style.display = user ? "none" : "block";
+          });
+
+          if (Clerk.user) {
+            // Mount user button component
+            Clerk.mountUserButton(userButton);
+            userButton.style.margin = "auto";
+
+            // sessionStorage.setItem(
+            //   "token",
+            //   await Clerk.session?.getToken({ template: "hasura" })
+            // );
+
+            // setInterval(
+            //   async () =>
+            //     sessionStorage.setItem(
+            //       "token",
+            //       await Clerk.session?.getToken({ template: "hasura" })
+            //     ),
+            //   1_000
+            // );
+          }
+        } catch (err) {
+          console.error("Error starting Clerk: ", err);
+        }
+      };
+
+      (() => {
+        const script = document.createElement("script");
+        script.setAttribute("data-clerk-publishable-key", publishableKey);
+        script.async = true;
+        script.src = `https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js`;
+        script.crossOrigin = "anonymous";
+        script.addEventListener("load", startClerk);
+        script.addEventListener("error", () => {
+          document.getElementById("no-frontend-api-warning").hidden = false;
+        });
+        document.body.appendChild(script);
+      })();
+    </script>
   </body>
 </html>

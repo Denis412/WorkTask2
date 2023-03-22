@@ -1,42 +1,29 @@
 <template>
   <q-layout view="hHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
-      </q-toolbar>
-    </q-header>
+    <MainHeader />
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
-      <q-list>
-        <q-item-label header> Список пользователей </q-item-label>
-      </q-list>
-    </q-drawer>
-
-    <q-drawer v-model="rightDrawerOpen" side="right" show-if-above bordered>
-      <q-list>
-        <q-item-label header> Список пользователей </q-item-label>
-      </q-list>
-    </q-drawer>
+    <MainDrawer side="left" title="Список чатов" v-model="leftDrawerOpen" />
+    <MainDrawer
+      side="right"
+      title="Список пользователей"
+      v-model="rightDrawerOpen"
+    />
 
     <q-page-container>
       <router-view v-slot="{ Component }">
-        <keep-aliveq>
+        <keep-alive>
           <component :is="Component" />
-        </keep-aliveq>
+        </keep-alive>
       </router-view>
     </q-page-container>
   </q-layout>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { onMounted, provide, ref } from "vue";
+import stompClient from "../lib/stompClient";
+import MainHeader from "src/components/MainHeader.vue";
+import MainDrawer from "src/components/MainDrawer.vue";
 
 const leftDrawerOpen = ref(false);
 const rightDrawerOpen = ref(false);
@@ -48,4 +35,16 @@ const toggleLeftDrawer = () => {
 const toggleRightDrawer = () => {
   rightDrawerOpen.value = !rightDrawerOpen.value;
 };
+
+provide("toggleLeftDrawer", toggleLeftDrawer);
+
+onMounted(() => {
+  const onMessage = (message) => {
+    const user = window.Clerk.user;
+  };
+
+  // stompClient.connect("user1", "user1", onConnect, (error) =>
+  //   console.log(error)
+  // );
+});
 </script>
