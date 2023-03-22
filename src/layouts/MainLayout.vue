@@ -14,7 +14,7 @@
       v-model="rightDrawerOpen"
     >
       <template #list>
-        <UsersList />
+        <UsersList :users-list="users" class="q-mt-md" />
       </template>
     </MainDrawer>
 
@@ -29,14 +29,20 @@
 </template>
 
 <script setup>
-import { onMounted, provide, ref, watchEffect } from "vue";
+import { computed, onMounted, onUpdated, provide, ref, watch } from "vue";
 import MainHeader from "src/components/MainHeader.vue";
 import MainDrawer from "src/components/MainDrawer.vue";
 import ChatsList from "src/components/ChatsList.vue";
 import UsersList from "src/components/UsersList.vue";
 import apolloClient from "../apollo/apollo-client";
-import { provideApolloClient } from "@vue/apollo-composable";
+import {
+  provideApolloClient,
+  useMutation,
+  useQuery,
+} from "@vue/apollo-composable";
 import { useStore } from "vuex";
+import { getUserById } from "../graphql-operations/query";
+import { createUser } from "../graphql-operations/mutations";
 
 const store = useStore();
 
@@ -51,7 +57,7 @@ const chats = ref([
     sender_id: "user_2NNDSNxio14fOwWraMxRaJqKTT5",
     consumer_id: "baba",
     sender_avatar: "ghgh",
-    sender_firstName: "Denis",
+    sender_firstName: "Danil",
     consumer_avatar: "ghgh",
     consumer_firstName: "Danil",
   },
@@ -60,11 +66,24 @@ const chats = ref([
     sender_id: "user_2NNDSNxio14fOwWraMxRaJqKTT5",
     consumer_id: "baba",
     sender_avatar: "ghgh",
-    sender_firstName: "Denis",
+    sender_firstName: "Alexey",
     consumer_avatar: "ghgh",
     consumer_firstName: "Alexey",
   },
 ]);
+const users = ref([
+  {
+    id: 1,
+    avatarUrl: "gg",
+    firstName: "Danil",
+  },
+  {
+    id: 2,
+    avatarUrl: "gg",
+    firstName: "Alexey",
+  },
+]);
+
 const messages = ref([]);
 
 const toggleLeftDrawer = () => {

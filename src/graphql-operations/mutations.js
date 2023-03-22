@@ -1,5 +1,15 @@
 import gql from "graphql-tag";
 
+export const createUser = gql`
+  mutation createUser($id: String, $first_name: String, $email: String) {
+    insert_users_one(
+      object: { id: $id, first_name: $first_name, email: $email }
+    ) {
+      id
+    }
+  }
+`;
+
 export const createMessage = gql`
   mutation createMessage(
     $senderId: String!

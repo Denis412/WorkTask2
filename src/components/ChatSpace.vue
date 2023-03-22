@@ -1,6 +1,6 @@
 <template>
   <div class="flex column relative">
-    <ChatHeader title="Danil" avatarUrl="ava" />
+    <ChatHeader :title="currentChat.sender_firstName" avatarUrl="ava" />
 
     <MessagesList :messages="currentMessages?.messages" />
 
@@ -25,7 +25,7 @@
 </template>
 
 <script setup>
-import { computed, inject, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import MessagesList from "./MessagesList.vue";
 import { useMutation, useQuery, useSubscription } from "@vue/apollo-composable";
 import { createMessage } from "../graphql-operations/mutations";
@@ -42,12 +42,12 @@ const {
   loading,
   refetch,
 } = useQuery(getSavedMessagesInThisChat, {
-  chat_id: currentChat.value,
+  chat_id: currentChat.value.id,
 });
 
 watch(currentChat, (value) => {
   refetch({
-    chat_id: currentChat.value,
+    chat_id: currentChat.value.id,
   });
 });
 
@@ -60,13 +60,15 @@ const sendMessage = async () => {
 
   const currentMessage = {
     senderId: user.id,
-    consumerId: "baba",
+    consumerId: "bgbg",
     senderDisplayName: user.firstName,
     senderAvatarUrl: user.profileImageUrl,
     content: message.value,
     created_at: Date.now(),
-    chat_id: 12,
+    chat_id: currentChat.value.id,
   };
+
+  console.log(currentMessage);
 
   currentMessages.value?.messages.push(currentMessage);
 
@@ -80,25 +82,6 @@ const sendMessage = async () => {
     console.log(error);
   }
 };
-
-watch(
-  () => currentChat,
-  (oldVal, newVal) => {
-    subscribeToMore(
-      getSavedMessagesInThisChat,
-      {
-        newVal,
-      },
-      (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev;
-        const newMessage = subscriptionData.data.messageAdded;
-        return {
-          messages: [...prev.messages, newMessage],
-        };
-      }
-    );
-  }
-);
 </script>
 
 <style lang="scss">

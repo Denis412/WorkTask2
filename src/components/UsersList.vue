@@ -1,5 +1,7 @@
 <template>
-  <UserItem v-for="user in usersList" :key="user.id" />
+  <q-list>
+    <UserItem v-for="user in usersList" :key="user.id" :currentUser="user" />
+  </q-list>
 </template>
 
 <script setup>
