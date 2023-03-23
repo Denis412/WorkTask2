@@ -39,6 +39,9 @@
 import { inject, ref } from "vue";
 import { useMutation } from "@vue/apollo-composable";
 import { createChat } from "../graphql-operations/mutations";
+import { useQuasar } from "quasar";
+
+const $q = useQuasar();
 
 const { currentUser } = defineProps({
   currentUser: Object,
@@ -51,6 +54,15 @@ const { mutate: creatingChat } = useMutation(createChat);
 
 const sendChat = async () => {
   const user = window.Clerk?.user;
+
+  if (currentUser.id === user.id) {
+    $q.notify({
+      type: "warning",
+      position: "top",
+      message: "Нельзя создать чат с самим собой!",
+    });
+    return;
+  }
 
   console.log("cur", currentUser);
   console.log("us", user);

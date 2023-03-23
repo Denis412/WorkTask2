@@ -47,6 +47,7 @@ import { getAllChatsForCurrentUser } from "../graphql-operations/query";
 provideApolloClient(apolloClient);
 
 const user = ref(null);
+//const session = ref(null);
 
 const { result: users } = useSubscription(getUsers);
 const { result: chats, refetch } = useQuery(getAllChatsForCurrentUser, {
@@ -65,11 +66,17 @@ const leftDrawerOpen = ref(false);
 const rightDrawerOpen = ref(false);
 
 onMounted(() => {
-  const timerId = setInterval(() => {
+  const timerIdUser = setInterval(() => {
     user.value = window.Clerk?.user;
 
-    if (user.value) clearInterval(timerId);
+    if (user.value) clearInterval(timerIdUser);
   }, 500);
+
+  // const timerIdSession = setInterval(() => {
+  //   session.value = window.Clerk?.session;
+
+  //   if (session.value) clearInterval(timerIdSession);
+  // }, 500);
 });
 
 const toggleLeftDrawer = () => {

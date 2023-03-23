@@ -81,7 +81,6 @@ const sendMessage = async () => {
   message.value = "";
 
   try {
-    const { result } = useQuery();
     const { data } = await createdMessage(currentMessage);
 
     console.log("mutate data", data);
