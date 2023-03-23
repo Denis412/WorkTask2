@@ -5,21 +5,38 @@
     </keep-alive>
   </router-view>
 
-  <div class="flex">
-    <video id="localVideo" autoplay></video>
-    <video id="remoteVideo" autoplay></video>
-  </div>
+  <q-dialog v-model="showVideoTracks" persistent>
+    <q-card style="max-width: 1100px">
+      <VideoStream />
+
+      <q-card-actions align="left">
+        <q-btn
+          flat
+          label="Выйти из видео чата"
+          color="negative"
+          v-close-popup
+        />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script setup>
 import { provideApolloClient, useMutation } from "@vue/apollo-composable";
-import { computed, onMounted, provide, watch } from "vue";
+import { onMounted, provide, ref, watch } from "vue";
 import { createUser } from "./graphql-operations/mutations";
 import apolloClient from "./apollo/apollo-client";
+import VideoStream from "./components/VideoStream.vue";
 
 provideApolloClient(apolloClient);
 
 const { mutate: creatingUser } = useMutation(createUser);
+
+const showVideoTracks = ref(false);
+
+const setTrueForShowVideoTrack = () => (showVideoTracks.value = true);
+
+provide("setTrueForShowVideoTrack", setTrueForShowVideoTrack);
 
 const publishableKey =
   "pk_test_c3Ryb25nLWNhbWVsLTQzLmNsZXJrLmFjY291bnRzLmRldiQ"; // <- Add Publishable Key here

@@ -5,14 +5,17 @@ export default async function () {
   const remoteVideo = document.getElementById("remoteVideo");
 
   const servers = null;
-  const api = new WebSocketApi();
+  const socket = new WebSocketApi();
 
   let localPeerConnection,
     remotePeerConnection = null;
 
   await navigator.mediaDevices
     .getUserMedia({
-      video: true,
+      video: {
+        height: 360,
+        width: 480,
+      },
       audio: true,
     })
     .then((stream) => {
@@ -23,15 +26,15 @@ export default async function () {
       localPeerConnection = new RTCPeerConnection(servers);
       localPeerConnection.addEventListener("icecandidate", (event) => {
         if (event.candidate) {
-          api.send({ event: "LOCAL_CANDIDATE", payload: event.candidate });
+          socket.send({ event: "LOCAL_CANDIDATE", payload: event.candidate });
         }
       });
 
-      api.on("REMOTE_CANDIDATE", (candidate) =>
+      socket.on("REMOTE_CANDIDATE", (candidate) =>
         localPeerConnection.addIceCandidate(new RTCIceCandidate(candidate))
       );
 
-      api.on("REMOTE_DESCRIPTION", (description) =>
+      socket.on("REMOTE_DESCRIPTION", (description) =>
         localPeerConnection.setRemoteDescription(description)
       );
 
@@ -40,21 +43,21 @@ export default async function () {
       localPeerConnection.createOffer().then((description) => {
         localPeerConnection.setLocalDescription(description);
 
-        api.send({ event: "LOCAL_DESCRIPTION", payload: description });
+        socket.send({ event: "LOCAL_DESCRIPTION", payload: description });
       });
     });
 
   remotePeerConnection = new RTCPeerConnection(servers);
-  api.on("LOCAL_DESCRIPTION", (description) => {
+  socket.on("LOCAL_DESCRIPTION", (description) => {
     remotePeerConnection.setRemoteDescription(description);
 
     remotePeerConnection.addEventListener("icecandidate", (event) => {
       if (event.candidate) {
-        api.send({ event: "REMOTE_CANDIDATE", payload: event.candidate });
+        socket.send({ event: "REMOTE_CANDIDATE", payload: event.candidate });
       }
     });
 
-    api.on("LOCAL_CANDIDATE", (candidate) => {
+    socket.on("LOCAL_CANDIDATE", (candidate) => {
       remotePeerConnection.addIceCandidate(new RTCIceCandidate(candidate));
     });
 
@@ -65,7 +68,7 @@ export default async function () {
     remotePeerConnection.createAnswer().then((description) => {
       remotePeerConnection.setLocalDescription(description);
 
-      api.send({ event: "REMOTE_DESCRIPTION", payload: description });
+      socket.send({ event: "REMOTE_DESCRIPTION", payload: description });
     });
   });
 }

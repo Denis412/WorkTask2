@@ -11,7 +11,7 @@
       <q-icon
         class="q-mx-md text-h5 text-primary cur-pointer"
         name="videocam"
-        @click="showVideos"
+        @click="setTrueForShowVideoTrack"
       />
     </div>
     <q-icon
@@ -22,15 +22,14 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import webRTC from "../sdk/webRTC";
+import { inject, ref } from "vue";
+// import webRTC from "../sdk/webRTC";
 
-webRTC();
+// webRTC();
 const { title, avatarUrl } = defineProps({
   title: String,
   avatarUrl: String,
 });
 
-const webrtc = ref(null);
-const show = ref(false);
+const setTrueForShowVideoTrack = inject("setTrueForShowVideoTrack");
 </script>
