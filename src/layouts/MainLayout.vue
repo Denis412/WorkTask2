@@ -1,45 +1,83 @@
 <template>
   <q-layout view="hHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar>
-        <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        />
-      </q-toolbar>
-    </q-header>
+    <MainHeader />
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
-      <q-list>
-        <q-item-label header> Список пользователей </q-item-label>
-      </q-list>
-    </q-drawer>
+    <MainDrawer side="left" title="Список чатов" v-model="leftDrawerOpen">
+      <template #list>
+        <ChatsList :chats-list="chats?.chats" class="q-mt-md" />
+      </template>
+    </MainDrawer>
 
-    <q-drawer v-model="rightDrawerOpen" side="right" show-if-above bordered>
-      <q-list>
-        <q-item-label header> Список пользователей </q-item-label>
-      </q-list>
-    </q-drawer>
+    <MainDrawer
+      side="right"
+      title="Список пользователей"
+      v-model="rightDrawerOpen"
+    >
+      <template #list>
+        <UsersList :users-list="users?.users" class="q-mt-md" />
+      </template>
+    </MainDrawer>
 
     <q-page-container>
       <router-view v-slot="{ Component }">
-        <keep-aliveq>
+        <keep-alive>
           <component :is="Component" />
-        </keep-aliveq>
+        </keep-alive>
       </router-view>
     </q-page-container>
   </q-layout>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { computed, onMounted, provide, ref, watch } from "vue";
+import MainHeader from "src/components/MainHeader.vue";
+import MainDrawer from "src/components/MainDrawer.vue";
+import ChatsList from "src/components/ChatsList.vue";
+import UsersList from "src/components/UsersList.vue";
+import apolloClient from "../apollo/apollo-client";
+import {
+  provideApolloClient,
+  useQuery,
+  useSubscription,
+} from "@vue/apollo-composable";
+import { useStore } from "vuex";
+import { getUsers } from "../graphql-operations/subscriptions";
+import { getAllChatsForCurrentUser } from "../graphql-operations/query";
+
+provideApolloClient(apolloClient);
+
+const user = ref(null);
+//const session = ref(null);
+
+const { result: users } = useSubscription(getUsers);
+const { result: chats, refetch } = useQuery(getAllChatsForCurrentUser, {
+  user_id: user?.id,
+});
+
+watch(user, (value) => {
+  refetch({
+    user_id: value.id,
+  });
+});
+
+const store = useStore();
 
 const leftDrawerOpen = ref(false);
 const rightDrawerOpen = ref(false);
+
+onMounted(() => {
+  const timerIdUser = setInterval(() => {
+    user.value = window.Clerk?.user;
+
+    if (user.value) clearInterval(timerIdUser);
+  }, 500);
+
+  // const timerIdSession = setInterval(() => {
+  //   session.value = window.Clerk?.session;
+
+  //   if (session.value) clearInterval(timerIdSession);
+  // }, 500);
+});
 
 const toggleLeftDrawer = () => {
   leftDrawerOpen.value = !leftDrawerOpen.value;
@@ -48,4 +86,12 @@ const toggleLeftDrawer = () => {
 const toggleRightDrawer = () => {
   rightDrawerOpen.value = !rightDrawerOpen.value;
 };
+
+const selectChat = (id) => {
+  store.commit("chat/CHANGE_CHAT", id);
+};
+
+provide("user", user);
+provide("selectChat", selectChat);
+provide("toggleLeftDrawer", toggleLeftDrawer);
 </script>

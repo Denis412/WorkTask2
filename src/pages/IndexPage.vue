@@ -1,5 +1,9 @@
 <template>
-  <q-page class="flex flex-center"> </q-page>
+  <q-page>
+    <ChatSpace />
+  </q-page>
 </template>
 
-<script setup></script>
+<script setup>
+import ChatSpace from "src/components/ChatSpace.vue";
+</script>
