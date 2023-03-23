@@ -25,9 +25,9 @@
 </template>
 
 <script setup>
-import { computed, inject, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import MessagesList from "./MessagesList.vue";
-import { useMutation, useQuery, useSubscription } from "@vue/apollo-composable";
+import { useMutation, useQuery } from "@vue/apollo-composable";
 import { createMessage } from "../graphql-operations/mutations";
 import { useStore } from "vuex";
 import { getSavedMessagesInThisChat } from "../graphql-operations/query";
@@ -60,8 +60,9 @@ watch(currentChat, async (value) => {
     calculatedAvatar.value = currentChat.value.consumer_avatar;
     calculatedFirstName.value = currentChat.value.consumer_firstName;
   } else {
-    calculatedAvatar.value = user.avatar_url;
-    calculatedFirstName.value = user.first_name;
+    console.log("hello", user);
+    calculatedAvatar.value = currentChat.value.sender_avatar;
+    calculatedFirstName.value = currentChat.value.sender_firstName;
   }
 
   messages.value = [...currentMessages.value?.messages];
