@@ -1,6 +1,6 @@
 <template>
   <div class="flex column relative">
-    <div v-if="!currentChat" class="flex justify-center items-center">
+    <div v-if="!selectedChat" class="flex justify-center items-center">
       <span class="text-h3">Выберите чат...</span>
     </div>
 
@@ -9,23 +9,7 @@
 
       <MessagesList :messages="messages" />
 
-      <q-form class="form-send absolute flex items-center">
-        <div class="form-controls q-ml-md">
-          <q-input
-            type="text"
-            v-model="message"
-            placeholder="Ваше сообщение..."
-          />
-        </div>
-
-        <div class="form-buttons q-mx-md">
-          <q-icon
-            class="send-button text-h5 text-primary"
-            name="send"
-            @click="sendMessage"
-          />
-        </div>
-      </q-form>
+      <SendForm :selectedChat="selectedChat" :messagePush="messagePush" />
     </div>
   </div>
 </template>
@@ -33,79 +17,49 @@
 <script setup>
 import { computed, ref, watch } from "vue";
 import MessagesList from "./MessagesList.vue";
-import { useMutation, useQuery } from "@vue/apollo-composable";
-import { createMessage } from "../graphql-operations/mutations";
+import { useQuery } from "@vue/apollo-composable";
+import SendForm from "../components/SendForm.vue";
 import { useStore } from "vuex";
 import { getSavedMessagesInThisChat } from "../graphql-operations/query";
 import ChatHeader from "./ChatHeader.vue";
 import { useQuasar } from "quasar";
 
 const store = useStore();
-const $q = useQuasar();
 
 const calculatedAvatar = ref("");
 const calculatedFirstName = ref("");
 
-const currentChat = computed(() => store.getters["chat/GET_CURRENT_CHAT"]);
+const selectedChat = computed(() => store.getters["chat/GET_CURRENT_CHAT"]);
 const messages = ref([]);
 
-const {
-  result: currentMessages,
-  loading,
-  refetch,
-} = useQuery(getSavedMessagesInThisChat, {
-  chat_id: currentChat.value.id,
-});
+const { result: currentMessages, refetch } = useQuery(
+  getSavedMessagesInThisChat,
+  {
+    chat_id: selectedChat.value.id,
+  }
+);
 
-watch(currentChat, async (value) => {
+const messagePush = (message) => {
+  messages.value.push(message);
+};
+
+watch(selectedChat, async (value) => {
   const user = window.Clerk.user;
 
   await refetch({
-    chat_id: currentChat.value.id,
+    chat_id: selectedChat.value.id,
   });
 
-  if (user.id === currentChat.value.sender_id) {
-    calculatedAvatar.value = currentChat.value.consumer_avatar;
-    calculatedFirstName.value = currentChat.value.consumer_firstName;
+  if (user.id === selectedChat.value.sender_id) {
+    calculatedAvatar.value = selectedChat.value.consumer_avatar;
+    calculatedFirstName.value = selectedChat.value.consumer_firstName;
   } else {
-    calculatedAvatar.value = currentChat.value.sender_avatar;
-    calculatedFirstName.value = currentChat.value.sender_firstName;
+    calculatedAvatar.value = selectedChat.value.sender_avatar;
+    calculatedFirstName.value = selectedChat.value.sender_firstName;
   }
 
   messages.value = [...currentMessages.value?.messages];
 });
-
-const { mutate: createdMessage } = useMutation(createMessage);
-
-const message = ref("");
-
-const sendMessage = async () => {
-  const user = window.Clerk.user;
-
-  const currentConsumerId =
-    user.id === currentChat.value.sender_id
-      ? currentChat.value.consumer_id
-      : currentChat.value.sender_id;
-
-  const currentMessage = {
-    senderId: user.id,
-    consumerId: currentConsumerId,
-    senderDisplayName: user.firstName,
-    senderAvatarUrl: user.profileImageUrl,
-    content: message.value,
-    created_at: Date.now(),
-    chat_id: currentChat.value.id,
-  };
-  messages.value.push(currentMessage);
-
-  message.value = "";
-
-  try {
-    const { data } = await createdMessage(currentMessage);
-  } catch (error) {
-    console.log(error);
-  }
-};
 </script>
 
 <style lang="scss">
