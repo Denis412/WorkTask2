@@ -1,26 +1,32 @@
 <template>
   <div class="flex column relative">
-    <ChatHeader :title="calculatedFirstName" :avatarUrl="calculatedAvatar" />
+    <div v-if="!currentChat" class="flex justify-center items-center">
+      <span class="text-h3">Выберите чат...</span>
+    </div>
 
-    <MessagesList :messages="messages" />
+    <div v-else>
+      <ChatHeader :title="calculatedFirstName" :avatarUrl="calculatedAvatar" />
 
-    <q-form class="form-send absolute flex items-center">
-      <div class="form-controls q-ml-md">
-        <q-input
-          type="text"
-          v-model="message"
-          placeholder="Ваше сообщение..."
-        />
-      </div>
+      <MessagesList :messages="messages" />
 
-      <div class="form-buttons q-mx-md">
-        <q-icon
-          class="send-button text-h5 text-primary"
-          name="send"
-          @click="sendMessage"
-        />
-      </div>
-    </q-form>
+      <q-form class="form-send absolute flex items-center">
+        <div class="form-controls q-ml-md">
+          <q-input
+            type="text"
+            v-model="message"
+            placeholder="Ваше сообщение..."
+          />
+        </div>
+
+        <div class="form-buttons q-mx-md">
+          <q-icon
+            class="send-button text-h5 text-primary"
+            name="send"
+            @click="sendMessage"
+          />
+        </div>
+      </q-form>
+    </div>
   </div>
 </template>
 
