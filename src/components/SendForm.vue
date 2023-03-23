@@ -19,8 +19,9 @@ import { useMutation } from "@vue/apollo-composable";
 import { ref } from "vue";
 import { createMessage } from "../graphql-operations/mutations";
 
-const { selectedChat, messagePush } = defineProps({
+const { selectedChat, messagePush, variables } = defineProps({
   selectedChat: Object,
+  variables: Object,
   messagePush: Function,
 });
 
@@ -36,6 +37,8 @@ const sendMessage = async () => {
       ? selectedChat.consumer_id
       : selectedChat.sender_id;
 
+  console.log(variables.chat_id);
+
   const currentMessage = {
     senderId: user.id,
     consumerId: currentConsumerId,
@@ -43,7 +46,7 @@ const sendMessage = async () => {
     senderAvatarUrl: user.profileImageUrl,
     content: message.value,
     created_at: Date.now(),
-    chat_id: selectedChat.id,
+    chat_id: variables.chat_id,
   };
 
   message.value = "";

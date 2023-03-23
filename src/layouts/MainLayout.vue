@@ -67,12 +67,6 @@ onMounted(() => {
 
     if (user.value) clearInterval(timerIdUser);
   }, 500);
-
-  // const timerIdSession = setInterval(() => {
-  //   session.value = window.Clerk?.session;
-
-  //   if (session.value) clearInterval(timerIdSession);
-  // }, 500);
 });
 
 const toggleLeftDrawer = () => {

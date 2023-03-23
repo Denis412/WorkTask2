@@ -7,10 +7,10 @@
     <div v-else>
       <ChatHeader :title="calculatedFirstName" :avatarUrl="calculatedAvatar" />
 
-      <div v-if="loading">Загрузка</div>
+      <div v-if="loading" class="text-center text-h3">Загрузка...</div>
       <MessagesList v-else :messages="currentMessages?.messages" />
 
-      <SendForm :selectedChat="selectedChat" />
+      <SendForm :selectedChat="selectedChat" :variables="variables" />
     </div>
   </div>
 </template>
@@ -30,7 +30,6 @@ const calculatedAvatar = ref("");
 const calculatedFirstName = ref("");
 
 const selectedChat = computed(() => store.getters["chat/GET_CURRENT_CHAT"]);
-const messages = ref([]);
 
 const variables = ref({ chat_id: selectedChat?.value.id });
 
@@ -38,10 +37,6 @@ const { result: currentMessages, loading } = useSubscription(
   getSavedMessagesInThisChat,
   variables
 );
-
-watch(loading, (value) => {
-  if (!value) messages.value = currentMessages.value?.messages || [];
-});
 
 watch(selectedChat, async (value) => {
   const user = window.Clerk.user;
