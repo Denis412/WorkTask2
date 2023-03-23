@@ -4,6 +4,11 @@
       <component :is="Component" />
     </keep-alive>
   </router-view>
+
+  <div class="flex">
+    <video id="localVideo" autoplay></video>
+    <video id="remoteVideo" autoplay></video>
+  </div>
 </template>
 
 <script setup>

@@ -11,9 +11,8 @@
       <q-icon
         class="q-mx-md text-h5 text-primary cur-pointer"
         name="videocam"
-        @click="show = !show"
+        @click="showVideos"
       />
-      <!-- <VueWebRTC ref="webrtc" width="100%" roomId="sample-room"> </VueWebRTC> -->
     </div>
     <q-icon
       class="q-mx-md text-h5 text-primary cur-pointer"
@@ -24,6 +23,9 @@
 
 <script setup>
 import { ref } from "vue";
+import webRTC from "../sdk/webRTC";
+
+webRTC();
 const { title, avatarUrl } = defineProps({
   title: String,
   avatarUrl: String,
