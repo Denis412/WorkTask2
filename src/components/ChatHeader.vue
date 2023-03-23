@@ -23,9 +23,7 @@
 
 <script setup>
 import { inject, ref } from "vue";
-// import webRTC from "../sdk/webRTC";
 
-// webRTC();
 const { title, avatarUrl } = defineProps({
   title: String,
   avatarUrl: String,
