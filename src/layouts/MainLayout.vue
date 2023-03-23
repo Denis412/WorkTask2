@@ -94,4 +94,5 @@ const selectChat = (id) => {
 provide("user", user);
 provide("selectChat", selectChat);
 provide("toggleLeftDrawer", toggleLeftDrawer);
+provide("toggleRightDrawer", toggleRightDrawer);
 </script>

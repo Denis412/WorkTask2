@@ -48,11 +48,19 @@ const { currentUser } = defineProps({
 });
 
 const showDialogWindow = ref(false);
-//const user = inject("user");
 
 const { mutate: creatingChat } = useMutation(createChat);
 
 const sendChat = async () => {
+  if (!window.Clerk?.user) {
+    $q.notify({
+      type: "negative",
+      position: "top",
+      message: "Упс! Надо сначала войти в аккаунт!",
+    });
+    return;
+  }
+
   const user = window.Clerk?.user;
 
   if (currentUser.id === user.id) {
