@@ -32,20 +32,6 @@ export const getAllChatsForCurrentUser = gql`
   }
 `;
 
-export const getAllChatsConsumerForCurrentUser = gql`
-  subscription getAllChatsSenderForCurrentUser($user_id: String!) {
-    chats(where: { consumer_id: { _eq: $user_id } }) {
-      sender_id
-      consumer_id
-      id
-      consumer_firstName
-      consumer_avatar
-      sender_firstName
-      sender_avatar
-    }
-  }
-`;
-
 export const getLastMessageInTheChat = gql`
   subscription getLastMessageInTheChat($chat_id: Int) {
     chats(where: { id: { _eq: $chat_id } }) {
@@ -65,16 +51,14 @@ export const getLastMessageInTheChat = gql`
 
 export const getSavedMessagesInThisChat = gql`
   subscription getSavedMessagesInThisChat($chat_id: Int) {
-    chats(where: { id: { _eq: $chat_id } }) {
-      messages {
-        id
-        senderId
-        senderDisplayName
-        senderAvatarUrl
-        created_at
-        content
-        consumerId
-      }
+    messages(where: { chat_id: { _eq: $chat_id } }) {
+      id
+      senderId
+      senderDisplayName
+      senderAvatarUrl
+      created_at
+      content
+      consumerId
     }
   }
 `;

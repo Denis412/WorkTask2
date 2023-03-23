@@ -46,12 +46,10 @@ const sendMessage = async () => {
     chat_id: selectedChat.id,
   };
 
-  messagePush(currentMessage);
-
   message.value = "";
 
   try {
-    const { data } = await createdMessage(currentMessage);
+    await createdMessage(currentMessage);
   } catch (error) {
     console.log(error);
   }

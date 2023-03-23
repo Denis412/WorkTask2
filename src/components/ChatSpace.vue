@@ -7,9 +7,10 @@
     <div v-else>
       <ChatHeader :title="calculatedFirstName" :avatarUrl="calculatedAvatar" />
 
-      <MessagesList :messages="messages" />
+      <div v-if="loading">Загрузка</div>
+      <MessagesList v-else :messages="currentMessages?.messages" />
 
-      <SendForm :selectedChat="selectedChat" :messagePush="messagePush" />
+      <SendForm :selectedChat="selectedChat" />
     </div>
   </div>
 </template>
@@ -17,12 +18,11 @@
 <script setup>
 import { computed, ref, watch } from "vue";
 import MessagesList from "./MessagesList.vue";
-import { useQuery } from "@vue/apollo-composable";
+import { useSubscription } from "@vue/apollo-composable";
 import SendForm from "../components/SendForm.vue";
 import { useStore } from "vuex";
-import { getSavedMessagesInThisChat } from "../graphql-operations/query";
+import { getSavedMessagesInThisChat } from "../graphql-operations/subscriptions";
 import ChatHeader from "./ChatHeader.vue";
-import { useQuasar } from "quasar";
 
 const store = useStore();
 
@@ -32,23 +32,21 @@ const calculatedFirstName = ref("");
 const selectedChat = computed(() => store.getters["chat/GET_CURRENT_CHAT"]);
 const messages = ref([]);
 
-const { result: currentMessages, refetch } = useQuery(
+const variables = ref({ chat_id: selectedChat?.value.id });
+
+const { result: currentMessages, loading } = useSubscription(
   getSavedMessagesInThisChat,
-  {
-    chat_id: selectedChat.value.id,
-  }
+  variables
 );
 
-const messagePush = (message) => {
-  messages.value.push(message);
-};
+watch(loading, (value) => {
+  if (!value) messages.value = currentMessages.value?.messages || [];
+});
 
 watch(selectedChat, async (value) => {
   const user = window.Clerk.user;
 
-  await refetch({
-    chat_id: selectedChat.value.id,
-  });
+  variables.value.chat_id = value?.id;
 
   if (user.id === selectedChat.value.sender_id) {
     calculatedAvatar.value = selectedChat.value.consumer_avatar;
@@ -57,8 +55,6 @@ watch(selectedChat, async (value) => {
     calculatedAvatar.value = selectedChat.value.sender_avatar;
     calculatedFirstName.value = selectedChat.value.sender_firstName;
   }
-
-  messages.value = [...currentMessages.value?.messages];
 });
 </script>
 

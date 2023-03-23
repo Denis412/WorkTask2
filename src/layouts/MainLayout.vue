@@ -42,22 +42,18 @@ import {
 } from "@vue/apollo-composable";
 import { useStore } from "vuex";
 import { getUsers } from "../graphql-operations/subscriptions";
-import { getAllChatsForCurrentUser } from "../graphql-operations/query";
+import { getAllChatsForCurrentUser } from "../graphql-operations/subscriptions";
 
 provideApolloClient(apolloClient);
 
 const user = ref(null);
-//const session = ref(null);
+const variables = ref({ user_id: user?.id });
 
 const { result: users } = useSubscription(getUsers);
-const { result: chats, refetch } = useQuery(getAllChatsForCurrentUser, {
-  user_id: user?.id,
-});
+const { result: chats } = useSubscription(getAllChatsForCurrentUser, variables);
 
 watch(user, (value) => {
-  refetch({
-    user_id: value.id,
-  });
+  variables.value.user_id = value?.id;
 });
 
 const store = useStore();

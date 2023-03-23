@@ -72,11 +72,8 @@ const sendChat = async () => {
     return;
   }
 
-  console.log("cur", currentUser);
-  console.log("us", user);
-
   try {
-    const { data } = await creatingChat({
+    await creatingChat({
       sender_id: user.id,
       consumer_id: currentUser.id,
       sender_avatar: user.profileImageUrl,
@@ -84,15 +81,9 @@ const sendChat = async () => {
       consumer_avatar: currentUser.avatar_url,
       consumer_firstName: currentUser.first_name,
     });
-
-    console.log(data);
   } catch (error) {
     console.log(error);
   }
-};
-
-const toggleShowDialogWindow = () => {
-  showDialogWindow.value = !showDialogWindow.value;
 };
 </script>
 
