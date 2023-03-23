@@ -1,5 +1,5 @@
 <template>
-  <div class="flex column relative">
+  <div class="flex column relative w-100p">
     <div v-if="!selectedChat" class="flex justify-center items-center">
       <span class="text-h3">Выберите чат...</span>
     </div>
@@ -9,8 +9,6 @@
 
       <div v-if="loading" class="text-center text-h3">Загрузка...</div>
       <MessagesList v-else :messages="currentMessages?.messages" />
-
-      <SendForm :selectedChat="selectedChat" :variables="variables" />
     </div>
   </div>
 </template>
@@ -19,7 +17,6 @@
 import { computed, ref, watch } from "vue";
 import MessagesList from "./MessagesList.vue";
 import { useSubscription } from "@vue/apollo-composable";
-import SendForm from "../components/SendForm.vue";
 import { useStore } from "vuex";
 import { getSavedMessagesInThisChat } from "../graphql-operations/subscriptions";
 import ChatHeader from "./ChatHeader.vue";
@@ -30,18 +27,17 @@ const calculatedAvatar = ref("");
 const calculatedFirstName = ref("");
 
 const selectedChat = computed(() => store.getters["chat/GET_CURRENT_CHAT"]);
-
-const variables = ref({ chat_id: selectedChat?.value.id });
+const variablesChat = ref({ chat_id: selectedChat?.value.id });
 
 const { result: currentMessages, loading } = useSubscription(
   getSavedMessagesInThisChat,
-  variables
+  variablesChat
 );
 
 watch(selectedChat, async (value) => {
   const user = window.Clerk.user;
 
-  variables.value.chat_id = value?.id;
+  variablesChat.value.chat_id = value?.id;
 
   if (user.id === selectedChat.value.sender_id) {
     calculatedAvatar.value = selectedChat.value.consumer_avatar;

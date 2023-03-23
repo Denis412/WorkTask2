@@ -1,5 +1,5 @@
 <template>
-  <q-page>
+  <q-page class="flex">
     <ChatSpace />
   </q-page>
 </template>

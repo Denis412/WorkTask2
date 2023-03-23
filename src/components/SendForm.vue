@@ -1,5 +1,5 @@
 <template>
-  <q-form class="form-send absolute flex items-center">
+  <q-form class="form-send flex items-center">
     <div class="form-controls q-ml-md">
       <q-input type="text" v-model="message" placeholder="Ваше сообщение..." />
     </div>

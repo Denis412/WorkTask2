@@ -1,5 +1,5 @@
 <template>
-  <q-list style="overflow-y: auto; max-height: 550px">
+  <q-list class="list-size">
     <q-item
       v-for="message in messages"
       :key="message.id"
@@ -31,3 +31,10 @@ const classes = {
   "justify-end": false,
 };
 </script>
+
+<style scoped>
+.list-size {
+  max-height: 75vh;
+  overflow-y: auto;
+}
+</style>
