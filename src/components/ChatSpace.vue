@@ -1,9 +1,6 @@
 <template>
   <div class="flex column relative">
-    <ChatHeader
-      :title="currentChat.sender_firstName"
-      :avatarUrl="currentChat.sender_avatar"
-    />
+    <ChatHeader :title="calculatedFirstName" :avatarUrl="calculatedAvatar" />
 
     <MessagesList :messages="messages" />
 
@@ -28,7 +25,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from "vue";
+import { computed, inject, ref, watch } from "vue";
 import MessagesList from "./MessagesList.vue";
 import { useMutation, useQuery, useSubscription } from "@vue/apollo-composable";
 import { createMessage } from "../graphql-operations/mutations";
@@ -37,6 +34,9 @@ import { getSavedMessagesInThisChat } from "../graphql-operations/query";
 import ChatHeader from "./ChatHeader.vue";
 
 const store = useStore();
+
+const calculatedAvatar = ref("");
+const calculatedFirstName = ref("");
 
 const currentChat = computed(() => store.getters["chat/GET_CURRENT_CHAT"]);
 const messages = ref([]);
@@ -50,9 +50,19 @@ const {
 });
 
 watch(currentChat, async (value) => {
+  const user = window.Clerk.user;
+
   await refetch({
     chat_id: currentChat.value.id,
   });
+
+  if (user.id === currentChat.value.sender_id) {
+    calculatedAvatar.value = currentChat.value.consumer_avatar;
+    calculatedFirstName.value = currentChat.value.consumer_firstName;
+  } else {
+    calculatedAvatar.value = user.avatar_url;
+    calculatedFirstName.value = user.first_name;
+  }
 
   messages.value = [...currentMessages.value?.messages];
 });
@@ -64,26 +74,26 @@ const message = ref("");
 const sendMessage = async () => {
   const user = window.Clerk.user;
 
+  const currentConsumerId =
+    user.id === currentChat.value.sender_id
+      ? currentChat.value.consumer_id
+      : currentChat.value.sender_id;
+
   const currentMessage = {
     senderId: user.id,
-    consumerId: "bgbg",
+    consumerId: currentConsumerId,
     senderDisplayName: user.firstName,
     senderAvatarUrl: user.profileImageUrl,
     content: message.value,
     created_at: Date.now(),
     chat_id: currentChat.value.id,
   };
-
-  console.log(currentMessage);
-
   messages.value.push(currentMessage);
 
   message.value = "";
 
   try {
     const { data } = await createdMessage(currentMessage);
-
-    console.log("mutate data", data);
   } catch (error) {
     console.log(error);
   }

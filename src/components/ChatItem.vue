@@ -20,7 +20,7 @@ const { currentChat } = defineProps({
   currentChat: Object,
 });
 
-const user = inject("user");
+const user = computed(() => inject("user"));
 const selectChat = inject("selectChat");
 
 const { result: lastMessages } = useSubscription(getLastMessageInTheChat, {
@@ -30,12 +30,12 @@ const { result: lastMessages } = useSubscription(getLastMessageInTheChat, {
 const lastMessage = computed(() => lastMessages.value?.chats[0]?.messages[0]);
 
 const calculateAvatar = () => {
-  return currentChat.sender_id === user.id
+  return currentChat.sender_id === user.value.value?.id
     ? currentChat.consumer_avatar
     : currentChat.sender_avatar;
 };
 const calculateUserName = () => {
-  return currentChat.sender_id === user.id
+  return currentChat.sender_id === user.value.value?.id
     ? currentChat.consumer_firstName
     : currentChat.sender_firstName;
 };
