@@ -31,15 +31,7 @@
 </template>
 
 <script setup>
-import {
-  computed,
-  inject,
-  onMounted,
-  onUpdated,
-  provide,
-  ref,
-  watch,
-} from "vue";
+import { computed, onMounted, provide, ref, watch } from "vue";
 import MainHeader from "src/components/MainHeader.vue";
 import MainDrawer from "src/components/MainDrawer.vue";
 import ChatsList from "src/components/ChatsList.vue";
@@ -47,28 +39,26 @@ import UsersList from "src/components/UsersList.vue";
 import apolloClient from "../apollo/apollo-client";
 import {
   provideApolloClient,
-  useMutation,
   useQuery,
   useSubscription,
 } from "@vue/apollo-composable";
 import { useStore } from "vuex";
-import {
-  getUsers,
-  getAllChatsSenderForCurrentUser,
-  getAllChatsConsumerForCurrentUser,
-} from "../graphql-operations/subscriptions";
-import { createUser } from "../graphql-operations/mutations";
-import { tSBigIntKeyword } from "@babel/types";
+import { getUsers } from "../graphql-operations/subscriptions";
+import { getAllChatsForCurrentUser } from "../graphql-operations/query";
 
 provideApolloClient(apolloClient);
 
+const user = ref(null);
+
 const { result: users } = useSubscription(getUsers);
-const { result: chats } = useSubscription(getAllChatsSenderForCurrentUser, {
-  user_id: "user_2NNbz4bcHzNK5Ke20UIqhOBbLMh",
+const { result: chats, refetch } = useQuery(getAllChatsForCurrentUser, {
+  user_id: user?.id,
 });
 
-const { result: chatsA } = useSubscription(getAllChatsConsumerForCurrentUser, {
-  user_id: "user_2NNbz4bcHzNK5Ke20UIqhOBbLMh",
+watch(user, (value) => {
+  refetch({
+    user_id: value.id,
+  });
 });
 
 const store = useStore();
@@ -76,7 +66,13 @@ const store = useStore();
 const leftDrawerOpen = ref(false);
 const rightDrawerOpen = ref(false);
 
-provideApolloClient(apolloClient);
+onMounted(() => {
+  const timerId = setInterval(() => {
+    user.value = window.Clerk?.user;
+
+    if (user.value) clearInterval(timerId);
+  }, 500);
+});
 
 // const chats = ref([
 //   {

@@ -1,8 +1,10 @@
 <template>
   <q-item clickable class="flex items-center" @click="selectChat(currentChat)">
-    <div>{{ currentChat.consumer_firstName }}</div>
+    <!-- {{ currentChat }} -->
+    <q-img class="avatar-min-size" :src="currentChat.sender_avatar" />
+    <div class="q-ml-md">{{ currentChat.consumer_firstName }}</div>
     <div class="q-ml-md text-grey">
-      <span
+      <span v-if="lastMessage"
         >{{ lastMessage?.senderDisplayName }}: {{ lastMessage?.content }}</span
       >
     </div>
@@ -19,6 +21,7 @@ const { result: lastMessages } = useSubscription(getLastMessageInTheChat, {
 });
 
 const lastMessage = computed(() => lastMessages.value?.chats[0]?.messages[0]);
+const user = computed(() => window.Clerk?.user);
 
 const { currentChat } = defineProps({
   currentChat: Object,

@@ -22,7 +22,13 @@
 
         <q-card-actions align="right">
           <q-btn flat label="Нет" color="primary" v-close-popup />
-          <q-btn flat label="Да" color="primary" v-close-popup />
+          <q-btn
+            flat
+            label="Да"
+            color="primary"
+            v-close-popup
+            @click="sendChat"
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -31,6 +37,8 @@
 
 <script setup>
 import { ref } from "vue";
+import { useMutation } from "@vue/apollo-composable";
+import { createChat } from "../graphql-operations/mutations";
 
 const { currentUser } = defineProps({
   currentUser: Object,
@@ -38,14 +46,33 @@ const { currentUser } = defineProps({
 
 const showDialogWindow = ref(false);
 
+const { mutate: creatingChat } = useMutation(createChat);
+
+const sendChat = async () => {
+  const user = window.Clerk?.user;
+
+  console.log("cur", currentUser);
+  console.log("us", user);
+
+  try {
+    const { data } = await creatingChat({
+      sender_id: user.id,
+      consumer_id: currentUser.id,
+      sender_avatar: user.profileImageUrl,
+      sender_firstName: user.firstName,
+      consumer_avatar: currentUser.avatar_url,
+      consumer_firstName: currentUser.first_name,
+    });
+
+    console.log(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const toggleShowDialogWindow = () => {
   showDialogWindow.value = !showDialogWindow.value;
 };
 </script>
 
-<style>
-.avatar-min-size {
-  width: 40px;
-  height: 40px;
-}
-</style>
+<style></style>

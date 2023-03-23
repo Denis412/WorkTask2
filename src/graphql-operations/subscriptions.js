@@ -11,9 +11,16 @@ export const getUsers = gql`
   }
 `;
 
-export const getAllChatsSenderForCurrentUser = gql`
-  subscription getAllChatsSenderForCurrentUser($user_id: String!) {
-    chats(where: { sender_id: { _eq: $user_id } }) {
+export const getAllChatsForCurrentUser = gql`
+  subscription getAllChatsForCurrentUser($user_id: String!) {
+    chats(
+      where: {
+        _or: [
+          { consumer_id: { _eq: $user_id } }
+          { sender_id: { _eq: $user_id } }
+        ]
+      }
+    ) {
       sender_id
       consumer_id
       id

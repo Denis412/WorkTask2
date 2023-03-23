@@ -2,7 +2,7 @@
   <div class="flex column relative">
     <ChatHeader :title="currentChat.sender_firstName" avatarUrl="ava" />
 
-    <MessagesList :messages="currentMessages?.messages" />
+    <MessagesList :messages="messages" />
 
     <q-form class="form-send absolute flex items-center">
       <div class="form-controls q-ml-md">
@@ -36,6 +36,7 @@ import ChatHeader from "./ChatHeader.vue";
 const store = useStore();
 
 const currentChat = computed(() => store.getters["chat/GET_CURRENT_CHAT"]);
+const messages = ref([]);
 
 const {
   result: currentMessages,
@@ -45,10 +46,12 @@ const {
   chat_id: currentChat.value.id,
 });
 
-watch(currentChat, (value) => {
-  refetch({
+watch(currentChat, async (value) => {
+  await refetch({
     chat_id: currentChat.value.id,
   });
+
+  messages.value = [...currentMessages.value?.messages];
 });
 
 const { mutate: createdMessage } = useMutation(createMessage);
@@ -70,7 +73,7 @@ const sendMessage = async () => {
 
   console.log(currentMessage);
 
-  currentMessages.value?.messages.push(currentMessage);
+  messages.value.push(currentMessage);
 
   message.value = "";
 

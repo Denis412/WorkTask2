@@ -1,5 +1,26 @@
 import gql from "graphql-tag";
 
+export const getAllChatsForCurrentUser = gql`
+  query getAllChatsForCurrentUser($user_id: String!) {
+    chats(
+      where: {
+        _or: [
+          { consumer_id: { _eq: $user_id } }
+          { sender_id: { _eq: $user_id } }
+        ]
+      }
+    ) {
+      sender_id
+      consumer_id
+      id
+      consumer_firstName
+      consumer_avatar
+      sender_firstName
+      sender_avatar
+    }
+  }
+`;
+
 export const getUsers = gql`
   query getUsers {
     users {
