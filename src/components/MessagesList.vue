@@ -18,25 +18,13 @@
 
 <script setup>
 import userApi from "src/sdk/user";
+import { calculateTime } from "src/utils/calculateTime";
 
 const { messages } = defineProps({
   messages: Array,
 });
 
 const checkSender = (user_id) => userApi.get()?.id === user_id;
-
-const calculateTime = (created_at) => {
-  const createdDate = new Date(created_at);
-
-  const createdHours = createdDate.getHours();
-  const createdMinutes = createdDate.getMinutes();
-
-  const stringHours = createdHours > 9 ? createdHours : `0${createdHours}`;
-  const stringMinutes =
-    createdMinutes > 9 ? createdMinutes : `0${createdMinutes}`;
-
-  return `${stringHours}:${stringMinutes}`;
-};
 
 const classes = {
   "justify-start": false,

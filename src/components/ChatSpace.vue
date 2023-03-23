@@ -60,7 +60,6 @@ watch(currentChat, async (value) => {
     calculatedAvatar.value = currentChat.value.consumer_avatar;
     calculatedFirstName.value = currentChat.value.consumer_firstName;
   } else {
-    console.log("hello", user);
     calculatedAvatar.value = currentChat.value.sender_avatar;
     calculatedFirstName.value = currentChat.value.sender_firstName;
   }
