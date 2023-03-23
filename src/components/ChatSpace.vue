@@ -38,8 +38,10 @@ import { createMessage } from "../graphql-operations/mutations";
 import { useStore } from "vuex";
 import { getSavedMessagesInThisChat } from "../graphql-operations/query";
 import ChatHeader from "./ChatHeader.vue";
+import { useQuasar } from "quasar";
 
 const store = useStore();
+const $q = useQuasar();
 
 const calculatedAvatar = ref("");
 const calculatedFirstName = ref("");
