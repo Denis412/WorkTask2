@@ -1,13 +1,16 @@
 <template>
   <div class="flex column relative w-100p">
     <div v-if="!selectedChat" class="flex justify-center items-center">
-      <span class="text-h3">Выберите чат...</span>
+      <span class="text-h3 text-center">Выберите чат...</span>
     </div>
 
     <div v-else>
       <ChatHeader :title="calculatedFirstName" :avatarUrl="calculatedAvatar" />
 
-      <div v-if="loading" class="text-center text-h3">Загрузка...</div>
+      <div v-if="loading" class="text-center text-h3">
+        Загрузка сообщений...
+      </div>
+
       <MessagesList v-else :messages="currentMessages?.messages" />
     </div>
   </div>
@@ -57,9 +60,5 @@ watch(selectedChat, async (value) => {
 
 .send-button {
   cursor: pointer;
-}
-
-.form-controls {
-  flex-grow: 2;
 }
 </style>

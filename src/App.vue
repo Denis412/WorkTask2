@@ -23,7 +23,7 @@
 
 <script setup>
 import { provideApolloClient, useMutation } from "@vue/apollo-composable";
-import { onMounted, provide, ref, watch } from "vue";
+import { onMounted, provide, ref } from "vue";
 import { createUser } from "./graphql-operations/mutations";
 import apolloClient from "./apollo/apollo-client";
 import VideoStream from "./components/VideoStream.vue";
@@ -39,25 +39,22 @@ const setTrueForShowVideoTrack = () => (showVideoTracks.value = true);
 provide("setTrueForShowVideoTrack", setTrueForShowVideoTrack);
 
 const publishableKey =
-  "pk_test_c3Ryb25nLWNhbWVsLTQzLmNsZXJrLmFjY291bnRzLmRldiQ"; // <- Add Publishable Key here
+  "pk_test_c3Ryb25nLWNhbWVsLTQzLmNsZXJrLmFjY291bnRzLmRldiQ";
 
 const startClerk = async () => {
   const Clerk = window.Clerk;
 
   try {
-    // Load Clerk environment and session if available
     await Clerk.load();
 
     const userButton = document.getElementById("user-button");
     const authLinks = document.getElementById("auth-links");
 
-    Clerk.addListener(({ user }) => {
-      // Display links conditionally based on user state
-      authLinks.style.display = user ? "none" : "block";
-    });
+    Clerk.addListener(
+      ({ user }) => (authLinks.style.display = user ? "none" : "block")
+    );
 
     if (Clerk.user) {
-      // Mount user button component
       Clerk.mountUserButton(userButton);
       userButton.style.margin = "auto";
 
@@ -75,7 +72,7 @@ const startClerk = async () => {
         1_000
       );
 
-      const { data } = await creatingUser({
+      await creatingUser({
         id: Clerk.user.id,
         first_name: Clerk.user.firstName,
         email: Clerk.user.primaryEmailAddress.emailAddress,
@@ -99,6 +96,4 @@ const startClerk = async () => {
   });
   document.body.appendChild(script);
 })();
-
-onMounted(async () => {});
 </script>

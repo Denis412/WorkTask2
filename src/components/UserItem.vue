@@ -7,6 +7,7 @@
     <div class="avatar-min-size">
       <q-img :src="currentUser.avatar_url" />
     </div>
+
     <div>
       <div class="q-ml-md">{{ currentUser.first_name }}</div>
     </div>
@@ -22,6 +23,7 @@
 
         <q-card-actions align="right">
           <q-btn flat label="Нет" color="primary" v-close-popup />
+
           <q-btn
             flat
             label="Да"
@@ -36,7 +38,7 @@
 </template>
 
 <script setup>
-import { inject, ref } from "vue";
+import { ref } from "vue";
 import { useMutation } from "@vue/apollo-composable";
 import { createChat } from "../graphql-operations/mutations";
 import { useQuasar } from "quasar";
@@ -86,5 +88,3 @@ const sendChat = async () => {
   }
 };
 </script>
-
-<style></style>

@@ -39,16 +39,18 @@
 
 <script setup>
 import { computed, onMounted, provide, ref, watch } from "vue";
+import { useStore } from "vuex";
+import { provideApolloClient, useSubscription } from "@vue/apollo-composable";
+import { getUsers } from "../graphql-operations/subscriptions";
+import { getAllChatsForCurrentUser } from "../graphql-operations/subscriptions";
+
+import apolloClient from "../apollo/apollo-client";
+
 import MainHeader from "src/components/MainHeader.vue";
 import MainDrawer from "src/components/MainDrawer.vue";
 import ChatsList from "src/components/ChatsList.vue";
 import UsersList from "src/components/UsersList.vue";
-import apolloClient from "../apollo/apollo-client";
 import SendForm from "src/components/SendForm.vue";
-import { provideApolloClient, useSubscription } from "@vue/apollo-composable";
-import { useStore } from "vuex";
-import { getUsers } from "../graphql-operations/subscriptions";
-import { getAllChatsForCurrentUser } from "../graphql-operations/subscriptions";
 
 provideApolloClient(apolloClient);
 

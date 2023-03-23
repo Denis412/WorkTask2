@@ -37,8 +37,6 @@ const sendMessage = async () => {
       ? selectedChat.consumer_id
       : selectedChat.sender_id;
 
-  console.log(variables.chat_id);
-
   const currentMessage = {
     senderId: user.id,
     consumerId: currentConsumerId,

@@ -1,6 +1,7 @@
 <template>
   <q-drawer :side="side" show-if-above bordered>
-    <div class="text-h5 text-center">{{ title }}</div>
+    <header class="text-h5 text-center">{{ title }}</header>
+
     <slot name="list">Список пуст</slot>
   </q-drawer>
 </template>
