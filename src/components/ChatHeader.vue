@@ -11,6 +11,7 @@
       <q-icon
         class="q-mx-md text-h5 text-primary cur-pointer"
         name="videocam"
+        @click="setTrueForShowVideoTrack"
       />
     </div>
     <q-icon
@@ -21,8 +22,12 @@
 </template>
 
 <script setup>
+import { inject, ref } from "vue";
+
 const { title, avatarUrl } = defineProps({
   title: String,
   avatarUrl: String,
 });
+
+const setTrueForShowVideoTrack = inject("setTrueForShowVideoTrack");
 </script>

@@ -19,9 +19,11 @@
     "graphql-subscriptions": "^2.0.0",
     "graphql-tag": "^2.12.6",
     "quasar": "^2.6.0",
+    "simplewebrtc": "^3.0.2",
     "stompjs": "^2.3.3",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0",
+    "vue-webrtc": "^3.0.1",
     "vuex": "^4.0.1"
   },
   "devDependencies": {
