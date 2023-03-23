@@ -4,8 +4,9 @@
     style="min-height: 4rem"
   >
     <div class="flex items-center">
-      <!-- <q-img class="q-ml-md" :src="avatarUrl" /> -->
-      ava
+      <div>
+        <q-img class="q-ml-md avatar-min-size" :src="avatarUrl" />
+      </div>
       <span class="q-ml-md text-h5">{{ title }}</span>
       <q-icon
         class="q-mx-md text-h5 text-primary cur-pointer"

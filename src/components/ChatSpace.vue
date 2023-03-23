@@ -1,6 +1,9 @@
 <template>
   <div class="flex column relative">
-    <ChatHeader :title="currentChat.sender_firstName" avatarUrl="ava" />
+    <ChatHeader
+      :title="currentChat.sender_firstName"
+      :avatarUrl="currentChat.sender_avatar"
+    />
 
     <MessagesList :messages="messages" />
 
@@ -78,6 +81,7 @@ const sendMessage = async () => {
   message.value = "";
 
   try {
+    const { result } = useQuery();
     const { data } = await createdMessage(currentMessage);
 
     console.log("mutate data", data);

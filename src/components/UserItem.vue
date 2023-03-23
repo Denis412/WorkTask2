@@ -36,7 +36,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { inject, ref } from "vue";
 import { useMutation } from "@vue/apollo-composable";
 import { createChat } from "../graphql-operations/mutations";
 
@@ -45,6 +45,7 @@ const { currentUser } = defineProps({
 });
 
 const showDialogWindow = ref(false);
+//const user = inject("user");
 
 const { mutate: creatingChat } = useMutation(createChat);
 

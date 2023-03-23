@@ -19,8 +19,6 @@
     </MainDrawer>
 
     <q-page-container>
-      <!-- <pre>{{ chats }}</pre>
-      <pre>{{ chatsA }}</pre> -->
       <router-view v-slot="{ Component }">
         <keep-alive>
           <component :is="Component" />
@@ -74,29 +72,6 @@ onMounted(() => {
   }, 500);
 });
 
-// const chats = ref([
-//   {
-//     id: 12,
-//     sender_id: "user_2NNDSNxio14fOwWraMxRaJqKTT5",
-//     consumer_id: "baba",
-//     sender_avatar: "ghgh",
-//     sender_firstName: "Danil",
-//     consumer_avatar: "ghgh",
-//     consumer_firstName: "Danil",
-//   },
-//   {
-//     id: 13,
-//     sender_id: "user_2NNDSNxio14fOwWraMxRaJqKTT5",
-//     consumer_id: "baba",
-//     sender_avatar: "ghgh",
-//     sender_firstName: "Alexey",
-//     consumer_avatar: "ghgh",
-//     consumer_firstName: "Alexey",
-//   },
-// ]);
-
-const messages = ref([]);
-
 const toggleLeftDrawer = () => {
   leftDrawerOpen.value = !leftDrawerOpen.value;
 };
@@ -109,7 +84,7 @@ const selectChat = (id) => {
   store.commit("chat/CHANGE_CHAT", id);
 };
 
-provide("messages", messages);
+provide("user", user);
 provide("selectChat", selectChat);
 provide("toggleLeftDrawer", toggleLeftDrawer);
 </script>
