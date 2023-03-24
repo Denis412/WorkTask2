@@ -5,7 +5,9 @@ export default async function () {
   const remoteVideo = document.getElementById("remoteVideo");
 
   const servers = null;
-  const socket = new WebSocketApi();
+  const socket = new WebSocketApi(
+    "wss://s8682.nyc1.piesocket.com/v3/1?api_key=rps1TX6SFSVYXWwj9xEjxjaV9H7fhqdeIWm0r7fL&notify_self=1"
+  );
 
   let localPeerConnection,
     remotePeerConnection = null;

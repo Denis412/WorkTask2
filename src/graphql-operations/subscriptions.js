@@ -51,7 +51,10 @@ export const getLastMessageInTheChat = gql`
 
 export const getSavedMessagesInThisChat = gql`
   subscription getSavedMessagesInThisChat($chat_id: Int) {
-    messages(where: { chat_id: { _eq: $chat_id } }) {
+    messages(
+      where: { chat_id: { _eq: $chat_id } }
+      order_by: { created_at: asc }
+    ) {
       id
       senderId
       senderDisplayName
