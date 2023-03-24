@@ -24,15 +24,32 @@
 <script setup>
 import { provideApolloClient, useMutation } from "@vue/apollo-composable";
 import { onMounted, provide, ref } from "vue";
-import { createUser } from "./graphql-operations/mutations";
+import { createUser, updateUserLastSeen } from "./graphql-operations/mutations";
 import apolloClient from "./apollo/apollo-client";
 import VideoStream from "./components/VideoStream.vue";
 
 provideApolloClient(apolloClient);
 
-const { mutate: creatingUser } = useMutation(createUser);
-
 const showVideoTracks = ref(false);
+
+const { mutate: creatingUser } = useMutation(createUser);
+const { mutate: updatinguserLastSeen } = useMutation(updateUserLastSeen);
+
+const updateLastSeen = async (id) => {
+  const lastSeen = new Date().toISOString();
+
+  await updatinguserLastSeen({
+    user_id: id,
+    last_seen: lastSeen,
+  });
+};
+
+const setToken = async () => {
+  sessionStorage.setItem(
+    "token",
+    await window.Clerk.session?.getToken({ template: "hasura" })
+  );
+};
 
 const setTrueForShowVideoTrack = () => (showVideoTracks.value = true);
 
@@ -58,26 +75,31 @@ const startClerk = async () => {
       Clerk.mountUserButton(userButton);
       userButton.style.margin = "auto";
 
-      sessionStorage.setItem(
-        "token",
-        await window.Clerk.session?.getToken({ template: "hasura" })
-      );
+      setToken();
+      const timerSetToken = setInterval(async () => {
+        await setToken();
 
-      setInterval(
-        async () =>
-          sessionStorage.setItem(
-            "token",
-            await window.Clerk.session?.getToken({ template: "hasura" })
-          ),
-        1_000
-      );
+        if (!Clerk.user) clearInterval(timerSetToken);
+      }, 1_000);
 
-      await creatingUser({
-        id: Clerk.user.id,
-        first_name: Clerk.user.firstName,
-        email: Clerk.user.primaryEmailAddress.emailAddress,
-        avatar_url: Clerk.user.profileImageUrl,
-      });
+      try {
+        await creatingUser({
+          id: Clerk.user.id,
+          first_name: Clerk.user.firstName,
+          email: Clerk.user.primaryEmailAddress.emailAddress,
+          avatar_url: Clerk.user.profileImageUrl,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+
+      await updateLastSeen(Clerk.user?.id);
+
+      const timerUpdateLastSeen = setInterval(async () => {
+        await updateLastSeen(Clerk.user?.id);
+
+        if (!Clerk.user) clearInterval(timerUpdateLastSeen);
+      }, 10_000);
     }
   } catch (err) {
     console.error("Error starting Clerk: ", err);

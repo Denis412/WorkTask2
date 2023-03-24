@@ -1,5 +1,14 @@
 import gql from "graphql-tag";
 
+export const getUsersLastSeen = gql`
+  query getUsersLastSeen($last_seen: timestamptz) {
+    users(where: { last_seen: { _gte: $last_seen } }) {
+      id
+      last_seen
+    }
+  }
+`;
+
 export const getAllChatsForCurrentUser = gql`
   query getAllChatsForCurrentUser($user_id: String!) {
     chats(

@@ -41,8 +41,10 @@
 import { computed, onMounted, provide, ref, watch } from "vue";
 import { useStore } from "vuex";
 import { provideApolloClient, useSubscription } from "@vue/apollo-composable";
-import { getUsers } from "../graphql-operations/subscriptions";
-import { getAllChatsForCurrentUser } from "../graphql-operations/subscriptions";
+import {
+  getAllChatsForCurrentUser,
+  getUsers,
+} from "../graphql-operations/subscriptions";
 
 import apolloClient from "../apollo/apollo-client";
 
@@ -58,11 +60,15 @@ const store = useStore();
 
 const user = ref(null);
 const variables = ref({ user_id: user?.id });
+
 const leftDrawerOpen = ref(false);
 const rightDrawerOpen = ref(false);
 
 const selectedChat = computed(() => store.getters["chat/GET_CURRENT_CHAT"]);
-const variablesSendForm = ref({ chat_id: selectedChat?.value.id });
+
+const variablesSendForm = ref({
+  chat_id: selectedChat.value?.id,
+});
 
 const { result: users } = useSubscription(getUsers);
 const { result: chats } = useSubscription(getAllChatsForCurrentUser, variables);

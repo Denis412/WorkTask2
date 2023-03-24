@@ -1,5 +1,16 @@
 import gql from "graphql-tag";
 
+export const updateUserLastSeen = gql`
+  mutation updateUserLastSeen($user_id: String!, $last_seen: timestamptz!) {
+    update_users(
+      where: { id: { _eq: $user_id } }
+      _set: { last_seen: $last_seen }
+    ) {
+      affected_rows
+    }
+  }
+`;
+
 export const createChat = gql`
   mutation createChat(
     $sender_id: String!
