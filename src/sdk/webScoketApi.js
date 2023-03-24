@@ -1,5 +1,6 @@
 export default class WebSocketApi {
-  constructor() {
+  constructor(url) {
+    this.ws = new WebSocket(url);
     this.events = {};
   }
 

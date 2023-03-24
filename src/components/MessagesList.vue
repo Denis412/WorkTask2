@@ -25,11 +25,6 @@ const { messages } = defineProps({
 });
 
 const checkSender = (user_id) => userApi.get()?.id === user_id;
-
-const classes = {
-  "justify-start": false,
-  "justify-end": false,
-};
 </script>
 
 <style scoped>

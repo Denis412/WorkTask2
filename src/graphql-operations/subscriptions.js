@@ -1,5 +1,17 @@
 import gql from "graphql-tag";
 
+export const getUserById = gql`
+  subscription getUsers($id: String!) {
+    users(where: { id: { _eq: $id } }) {
+      id
+      first_name
+      email
+      avatar_url
+      last_seen
+    }
+  }
+`;
+
 export const getUsers = gql`
   subscription getUsers {
     users {
@@ -7,6 +19,7 @@ export const getUsers = gql`
       first_name
       email
       avatar_url
+      last_seen
     }
   }
 `;
@@ -51,7 +64,10 @@ export const getLastMessageInTheChat = gql`
 
 export const getSavedMessagesInThisChat = gql`
   subscription getSavedMessagesInThisChat($chat_id: Int) {
-    messages(where: { chat_id: { _eq: $chat_id } }) {
+    messages(
+      where: { chat_id: { _eq: $chat_id } }
+      order_by: { created_at: asc }
+    ) {
       id
       senderId
       senderDisplayName

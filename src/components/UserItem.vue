@@ -4,9 +4,11 @@
     clickable
     @click="showDialogWindow = true"
   >
-    <div class="avatar-min-size">
-      <q-img :src="currentUser.avatar_url" />
+    <div class="avatar-min-size" style="position: relative">
+      <q-img :src="currentUser.avatar_url" style="position: relative" />
+      <q-icon class="status_icon" :style="{ 'background-color': status }" />
     </div>
+
     <div>
       <div class="q-ml-md">{{ currentUser.first_name }}</div>
     </div>
@@ -22,6 +24,7 @@
 
         <q-card-actions align="right">
           <q-btn flat label="Нет" color="primary" v-close-popup />
+
           <q-btn
             flat
             label="Да"
@@ -36,12 +39,16 @@
 </template>
 
 <script setup>
-import { inject, ref } from "vue";
-import { useMutation } from "@vue/apollo-composable";
+import { onMounted, ref } from "vue";
+import { useMutation, useSubscription } from "@vue/apollo-composable";
 import { createChat } from "../graphql-operations/mutations";
+import { getUserById } from "../graphql-operations/subscriptions";
 import { useQuasar } from "quasar";
 
 const $q = useQuasar();
+const { result: user } = useSubscription(getUserById, {
+  id: currentUser.id,
+});
 
 const { currentUser } = defineProps({
   currentUser: Object,
@@ -50,6 +57,16 @@ const { currentUser } = defineProps({
 const showDialogWindow = ref(false);
 
 const { mutate: creatingChat } = useMutation(createChat);
+
+const status = ref("red");
+
+const setStatus = () => {
+  status.value =
+    new Date().getTime() - new Date(user?.value?.users[0].last_seen).getTime() >
+    15_000
+      ? "red"
+      : "green";
+};
 
 const sendChat = async () => {
   if (!window.Clerk?.user) {
@@ -85,6 +102,21 @@ const sendChat = async () => {
     console.log(error);
   }
 };
+
+onMounted(() => {
+  setStatus();
+
+  setInterval(setStatus, 1_000);
+});
 </script>
 
-<style></style>
+<style scoped>
+.status_icon {
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+</style>
