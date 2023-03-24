@@ -7,13 +7,16 @@
       <div>
         <q-img class="q-ml-md avatar-min-size" :src="avatarUrl" />
       </div>
+
       <span class="q-ml-md text-h5">{{ title }}</span>
+
       <q-icon
         class="q-mx-md text-h5 text-primary cur-pointer"
         name="videocam"
         @click="setTrueForShowVideoTrack"
       />
     </div>
+
     <q-icon
       class="q-mx-md text-h5 text-primary cur-pointer"
       name="arrow_back"

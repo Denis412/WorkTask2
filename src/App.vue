@@ -23,64 +23,83 @@
 
 <script setup>
 import { provideApolloClient, useMutation } from "@vue/apollo-composable";
-import { onMounted, provide, ref, watch } from "vue";
-import { createUser } from "./graphql-operations/mutations";
+import { onMounted, provide, ref } from "vue";
+import { createUser, updateUserLastSeen } from "./graphql-operations/mutations";
 import apolloClient from "./apollo/apollo-client";
 import VideoStream from "./components/VideoStream.vue";
 
 provideApolloClient(apolloClient);
 
-const { mutate: creatingUser } = useMutation(createUser);
-
 const showVideoTracks = ref(false);
+
+const { mutate: creatingUser } = useMutation(createUser);
+const { mutate: updatinguserLastSeen } = useMutation(updateUserLastSeen);
+
+const updateLastSeen = async (id) => {
+  const lastSeen = new Date().toISOString();
+
+  await updatinguserLastSeen({
+    user_id: id,
+    last_seen: lastSeen,
+  });
+};
+
+const setToken = async () => {
+  sessionStorage.setItem(
+    "token",
+    await window.Clerk.session?.getToken({ template: "hasura" })
+  );
+};
 
 const setTrueForShowVideoTrack = () => (showVideoTracks.value = true);
 
 provide("setTrueForShowVideoTrack", setTrueForShowVideoTrack);
 
 const publishableKey =
-  "pk_test_c3Ryb25nLWNhbWVsLTQzLmNsZXJrLmFjY291bnRzLmRldiQ"; // <- Add Publishable Key here
+  "pk_test_c3Ryb25nLWNhbWVsLTQzLmNsZXJrLmFjY291bnRzLmRldiQ";
 
 const startClerk = async () => {
   const Clerk = window.Clerk;
 
   try {
-    // Load Clerk environment and session if available
     await Clerk.load();
 
     const userButton = document.getElementById("user-button");
     const authLinks = document.getElementById("auth-links");
 
-    Clerk.addListener(({ user }) => {
-      // Display links conditionally based on user state
-      authLinks.style.display = user ? "none" : "block";
-    });
+    Clerk.addListener(
+      ({ user }) => (authLinks.style.display = user ? "none" : "block")
+    );
 
     if (Clerk.user) {
-      // Mount user button component
       Clerk.mountUserButton(userButton);
       userButton.style.margin = "auto";
 
-      sessionStorage.setItem(
-        "token",
-        await window.Clerk.session?.getToken({ template: "hasura" })
-      );
+      setToken();
+      const timerSetToken = setInterval(async () => {
+        await setToken();
 
-      setInterval(
-        async () =>
-          sessionStorage.setItem(
-            "token",
-            await window.Clerk.session?.getToken({ template: "hasura" })
-          ),
-        1_000
-      );
+        if (!Clerk.user) clearInterval(timerSetToken);
+      }, 1_000);
 
-      const { data } = await creatingUser({
-        id: Clerk.user.id,
-        first_name: Clerk.user.firstName,
-        email: Clerk.user.primaryEmailAddress.emailAddress,
-        avatar_url: Clerk.user.profileImageUrl,
-      });
+      try {
+        await creatingUser({
+          id: Clerk.user.id,
+          first_name: Clerk.user.firstName,
+          email: Clerk.user.primaryEmailAddress.emailAddress,
+          avatar_url: Clerk.user.profileImageUrl,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+
+      await updateLastSeen(Clerk.user?.id);
+
+      const timerUpdateLastSeen = setInterval(async () => {
+        await updateLastSeen(Clerk.user?.id);
+
+        if (!Clerk.user) clearInterval(timerUpdateLastSeen);
+      }, 10_000);
     }
   } catch (err) {
     console.error("Error starting Clerk: ", err);
@@ -99,6 +118,4 @@ const startClerk = async () => {
   });
   document.body.appendChild(script);
 })();
-
-onMounted(async () => {});
 </script>

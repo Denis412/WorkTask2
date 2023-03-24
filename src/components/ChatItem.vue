@@ -8,8 +8,10 @@
       <div class="flex justify-center">
         <q-img class="avatar-min-size" :src="calculateAvatar()" />
       </div>
+
       <div class="q-ml-sm text-center">{{ calculateUserName() }}</div>
     </div>
+
     <div
       v-if="lastMessage"
       class="q-ml-md text-grey"

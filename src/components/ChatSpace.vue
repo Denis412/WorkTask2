@@ -1,31 +1,17 @@
 <template>
-  <div class="flex column relative">
-    <div v-if="!currentChat" class="flex justify-center items-center">
-      <span class="text-h3">Выберите чат...</span>
+  <div class="flex column relative w-100p">
+    <div v-if="!selectedChat" class="flex justify-center items-center">
+      <span class="text-h3 text-center">Выберите чат...</span>
     </div>
 
     <div v-else>
       <ChatHeader :title="calculatedFirstName" :avatarUrl="calculatedAvatar" />
 
-      <MessagesList :messages="messages" />
+      <div v-if="loading" class="text-center text-h3">
+        Загрузка сообщений...
+      </div>
 
-      <q-form class="form-send absolute flex items-center">
-        <div class="form-controls q-ml-md">
-          <q-input
-            type="text"
-            v-model="message"
-            placeholder="Ваше сообщение..."
-          />
-        </div>
-
-        <div class="form-buttons q-mx-md">
-          <q-icon
-            class="send-button text-h5 text-primary"
-            name="send"
-            @click="sendMessage"
-          />
-        </div>
-      </q-form>
+      <MessagesList v-else :messages="currentMessages?.messages" />
     </div>
   </div>
 </template>
@@ -33,79 +19,37 @@
 <script setup>
 import { computed, ref, watch } from "vue";
 import MessagesList from "./MessagesList.vue";
-import { useMutation, useQuery } from "@vue/apollo-composable";
-import { createMessage } from "../graphql-operations/mutations";
+import { useSubscription } from "@vue/apollo-composable";
 import { useStore } from "vuex";
-import { getSavedMessagesInThisChat } from "../graphql-operations/query";
+import { getSavedMessagesInThisChat } from "../graphql-operations/subscriptions";
 import ChatHeader from "./ChatHeader.vue";
-import { useQuasar } from "quasar";
 
 const store = useStore();
-const $q = useQuasar();
 
 const calculatedAvatar = ref("");
 const calculatedFirstName = ref("");
 
-const currentChat = computed(() => store.getters["chat/GET_CURRENT_CHAT"]);
-const messages = ref([]);
+const selectedChat = computed(() => store.getters["chat/GET_CURRENT_CHAT"]);
+const variablesChat = ref({ chat_id: selectedChat?.value.id });
 
-const {
-  result: currentMessages,
-  loading,
-  refetch,
-} = useQuery(getSavedMessagesInThisChat, {
-  chat_id: currentChat.value.id,
-});
+const { result: currentMessages, loading } = useSubscription(
+  getSavedMessagesInThisChat,
+  variablesChat
+);
 
-watch(currentChat, async (value) => {
+watch(selectedChat, async (value) => {
   const user = window.Clerk.user;
 
-  await refetch({
-    chat_id: currentChat.value.id,
-  });
+  variablesChat.value.chat_id = value?.id;
 
-  if (user.id === currentChat.value.sender_id) {
-    calculatedAvatar.value = currentChat.value.consumer_avatar;
-    calculatedFirstName.value = currentChat.value.consumer_firstName;
+  if (user.id === selectedChat.value.sender_id) {
+    calculatedAvatar.value = selectedChat.value.consumer_avatar;
+    calculatedFirstName.value = selectedChat.value.consumer_firstName;
   } else {
-    calculatedAvatar.value = currentChat.value.sender_avatar;
-    calculatedFirstName.value = currentChat.value.sender_firstName;
+    calculatedAvatar.value = selectedChat.value.sender_avatar;
+    calculatedFirstName.value = selectedChat.value.sender_firstName;
   }
-
-  messages.value = [...currentMessages.value?.messages];
 });
-
-const { mutate: createdMessage } = useMutation(createMessage);
-
-const message = ref("");
-
-const sendMessage = async () => {
-  const user = window.Clerk.user;
-
-  const currentConsumerId =
-    user.id === currentChat.value.sender_id
-      ? currentChat.value.consumer_id
-      : currentChat.value.sender_id;
-
-  const currentMessage = {
-    senderId: user.id,
-    consumerId: currentConsumerId,
-    senderDisplayName: user.firstName,
-    senderAvatarUrl: user.profileImageUrl,
-    content: message.value,
-    created_at: Date.now(),
-    chat_id: currentChat.value.id,
-  };
-  messages.value.push(currentMessage);
-
-  message.value = "";
-
-  try {
-    const { data } = await createdMessage(currentMessage);
-  } catch (error) {
-    console.log(error);
-  }
-};
 </script>
 
 <style lang="scss">
@@ -116,9 +60,5 @@ const sendMessage = async () => {
 
 .send-button {
   cursor: pointer;
-}
-
-.form-controls {
-  flex-grow: 2;
 }
 </style>
