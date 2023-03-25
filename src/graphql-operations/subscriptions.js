@@ -56,6 +56,7 @@ export const getAllChatsForCurrentUser = gql`
       consumer_avatar
       sender_firstName
       sender_avatar
+      call_id
     }
   }
 `;

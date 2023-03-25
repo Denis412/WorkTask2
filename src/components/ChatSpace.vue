@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from "vue";
+import { computed, inject, ref, watch } from "vue";
 import MessagesList from "./MessagesList.vue";
 import { useSubscription, useMutation, useQuery } from "@vue/apollo-composable";
 import { useStore } from "vuex";
@@ -35,22 +35,15 @@ const selectedChat = computed(() => store.getters["chat/GET_CURRENT_CHAT"]);
 const currentCallId = computed(() => store.getters["chat/GET_CURRENT_CALL"]);
 const currentUser = computed(() => store.getters["chat/GET_CURRENT_USER"]);
 
-const variablesChat = ref({ chat_id: selectedChat?.value.id });
+const variablesChat = ref({ chat_id: selectedChat?.value?.id });
 
 const { mutate: creatingCall } = useMutation(createCallInChat);
 const { result: currentMessages, loading } = useSubscription(
   getSavedMessagesInThisChat,
   variablesChat
 );
-const { result: currentIdCalls, refetch } = useQuery(getCurrentIdCalls, {
-  user_id: currentUser.value?.id,
-});
 
-watch(currentUser, (value) => {
-  refetch({
-    user_id: value.id,
-  });
-});
+// const currentChats = inject("currentChats");
 
 watch(selectedChat, async (value) => {
   variablesChat.value.chat_id = value?.id;
@@ -67,6 +60,15 @@ watch(selectedChat, async (value) => {
 watch(currentCallId, async (value) => {
   if (!value) return;
 
+  // console.log(currentCallId.value);
+  // console.log(selectedChat.value.call_id);
+
+  if (currentCallId.value === selectedChat.value.call_id) {
+    console.log("equal");
+  }
+
+  // store.commit("chat/CHANGE_CALL_ID_IN_CHAT", value);
+
   let sender,
     consumer = "";
 
@@ -77,6 +79,8 @@ watch(currentCallId, async (value) => {
     sender = selectedChat.value.consumer_id;
     consumer = selectedChat.value.sender_id;
   }
+
+  // selectedChat.value.call_id = value;
 
   try {
     const { data } = await creatingCall({

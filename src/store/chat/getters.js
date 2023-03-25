@@ -6,6 +6,10 @@ export function GET_CURRENT_USER(state) {
   return state.currentUser;
 }
 
+export function GET_CURRENT_CHATS(state) {
+  return state.currentChats;
+}
+
 export function GET_CURRENT_CALL(state) {
   return state.currentCallId;
 }

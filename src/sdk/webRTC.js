@@ -143,4 +143,8 @@ export default function () {
       });
     });
   };
+
+  hangupButton.onclick = () => {
+    store.commit("chat/CHANGE_CALL", null);
+  };
 }

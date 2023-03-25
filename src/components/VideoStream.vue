@@ -1,6 +1,5 @@
 <template>
   <div class="flex items-center text-center justify-center column">
-    <h2>Ваш видеочат</h2>
     <div class="videos">
       <span>
         <h3>Ваша камера</h3>

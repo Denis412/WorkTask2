@@ -85,8 +85,8 @@ const selectChat = (id) => {
   store.commit("chat/CHANGE_CHAT", id);
 };
 
-provide("user", user);
 provide("selectChat", selectChat);
+provide("currentChats", chats);
 provide("toggleLeftDrawer", toggleLeftDrawer);
 provide("toggleRightDrawer", toggleRightDrawer);
 
