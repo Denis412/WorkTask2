@@ -19,13 +19,11 @@
 <script setup>
 import { computed, ref, watch } from "vue";
 import MessagesList from "./MessagesList.vue";
-import { useSubscription, useMutation } from "@vue/apollo-composable";
+import { useSubscription, useMutation, useQuery } from "@vue/apollo-composable";
 import { useStore } from "vuex";
-import {
-  getSavedMessagesInThisChat,
-  getCurrentIdCalls,
-} from "../graphql-operations/subscriptions";
-import { createCall } from "src/graphql-operations/mutations";
+import { getSavedMessagesInThisChat } from "../graphql-operations/subscriptions";
+import { getCurrentIdCalls } from "../graphql-operations/query";
+import { createCallInChat } from "src/graphql-operations/mutations";
 import ChatHeader from "./ChatHeader.vue";
 
 const store = useStore();
@@ -39,14 +37,20 @@ const currentUser = computed(() => store.getters["chat/GET_CURRENT_USER"]);
 
 const variablesChat = ref({ chat_id: selectedChat?.value.id });
 
-const { mutate: creatingCall } = useMutation(createCall);
+const { mutate: creatingCall } = useMutation(createCallInChat);
 const { result: currentMessages, loading } = useSubscription(
   getSavedMessagesInThisChat,
   variablesChat
 );
-// const { result: currentIdCalls } = useSubscription(getCurrentIdCalls, {
-//   user_id: window.Clerk.user.id,
-// });
+const { result: currentIdCalls, refetch } = useQuery(getCurrentIdCalls, {
+  user_id: currentUser.value?.id,
+});
+
+watch(currentUser, (value) => {
+  refetch({
+    user_id: value.id,
+  });
+});
 
 watch(selectedChat, async (value) => {
   variablesChat.value.chat_id = value?.id;
@@ -63,8 +67,6 @@ watch(selectedChat, async (value) => {
 watch(currentCallId, async (value) => {
   if (!value) return;
 
-  console.log("current", currentIdCalls);
-
   let sender,
     consumer = "";
 
@@ -78,9 +80,8 @@ watch(currentCallId, async (value) => {
 
   try {
     const { data } = await creatingCall({
-      id: value,
-      sender_id: sender,
-      consumer_id: consumer,
+      id: selectedChat.value.id,
+      call_id: value,
     });
 
     console.log(data);

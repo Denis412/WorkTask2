@@ -1,14 +1,4 @@
 <template>
-  <!-- <q-card-section class="flex row justify-center row">
-    <div class="q-pa-sm">
-      <video class="rounded-borders" id="localVideo" autoplay></video>
-    </div>
-
-    <div class="q-pa-sm">
-      <video class="rounded-borders" id="remoteVideo" autoplay></video>
-    </div>
-  </q-card-section> -->
-
   <div class="flex items-center text-center justify-center column">
     <h2>Ваш видеочат</h2>
     <div class="videos">
@@ -16,6 +6,7 @@
         <h3>Ваша камера</h3>
         <video id="webcamVideo" autoplay playsinline></video>
       </span>
+
       <span>
         <h3>Камера собеседника</h3>
         <video id="remoteVideo" autoplay playsinline></video>
@@ -23,17 +14,16 @@
     </div>
 
     <button id="webcamButton">Включить камеру</button>
+
     <h2>Начать видеозвонок</h2>
     <button id="callButton" disabled>Создать видеочат (приглашение)</button>
 
     <h2>Присоединитсья к видеочату</h2>
-    <!-- <p>Answer the call from a different browser window or device</p> -->
-
     <input id="callInput" />
+
     <button id="answerButton" disabled>Присоединиться</button>
 
     <h2>Сбросить</h2>
-
     <button id="hangupButton" disabled>Отключиться</button>
   </div>
 </template>

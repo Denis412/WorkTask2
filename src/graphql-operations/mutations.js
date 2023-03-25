@@ -1,25 +1,9 @@
 import gql from "graphql-tag";
 
-export const createCall = gql`
-  mutation createCall(
-    $id: String!
-    $sender_id: String!
-    $consumer_id: String!
-  ) {
-    insert_calls_one(
-      object: { id: $id, sender_id: $sender_id, consumer_id: $consumer_id }
-    ) {
+export const createCallInChat = gql`
+  mutation createCallInChat($id: Int!, $call_id: String!) {
+    update_chats_by_pk(pk_columns: { id: $id }, _set: { call_id: $call_id }) {
       id
-    }
-  }
-`;
-
-export const deleteCall = gql`
-  mutation deleteCall($id: String!) {
-    delete_calls_by_pk(id: $id) {
-      id
-      sender_id
-      consumer_id
     }
   }
 `;
