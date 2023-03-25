@@ -24,11 +24,14 @@
 <script setup>
 import { provideApolloClient, useMutation } from "@vue/apollo-composable";
 import { onMounted, provide, ref } from "vue";
+import { useStore } from "vuex";
 import { createUser, updateUserLastSeen } from "./graphql-operations/mutations";
 import apolloClient from "./apollo/apollo-client";
 import VideoStream from "./components/VideoStream.vue";
 
 provideApolloClient(apolloClient);
+
+const store = useStore();
 
 const showVideoTracks = ref(false);
 
@@ -74,6 +77,8 @@ const startClerk = async () => {
     if (Clerk.user) {
       Clerk.mountUserButton(userButton);
       userButton.style.margin = "auto";
+
+      store.commit("chat/SET_CURRENT_USER", Clerk.user);
 
       setToken();
       const timerSetToken = setInterval(async () => {

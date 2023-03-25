@@ -1,5 +1,20 @@
 import gql from "graphql-tag";
 
+export const getCurrentIdCalls = gql`
+  subscription getCurrentIdCalls($user_id: String!) {
+    calls(
+      where: {
+        _or: [
+          { consumer_id: { _eq: $user_id } }
+          { sender_id: { _eq: $user_id } }
+        ]
+      }
+    ) {
+      id
+    }
+  }
+`;
+
 export const getUserById = gql`
   subscription getUsers($id: String!) {
     users(where: { id: { _eq: $id } }) {

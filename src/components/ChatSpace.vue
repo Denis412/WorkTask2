@@ -21,7 +21,10 @@ import { computed, ref, watch } from "vue";
 import MessagesList from "./MessagesList.vue";
 import { useSubscription, useMutation } from "@vue/apollo-composable";
 import { useStore } from "vuex";
-import { getSavedMessagesInThisChat } from "../graphql-operations/subscriptions";
+import {
+  getSavedMessagesInThisChat,
+  getCurrentIdCalls,
+} from "../graphql-operations/subscriptions";
 import { createCall } from "src/graphql-operations/mutations";
 import ChatHeader from "./ChatHeader.vue";
 
@@ -32,6 +35,8 @@ const calculatedFirstName = ref("");
 
 const selectedChat = computed(() => store.getters["chat/GET_CURRENT_CHAT"]);
 const currentCallId = computed(() => store.getters["chat/GET_CURRENT_CALL"]);
+const currentUser = computed(() => store.getters["chat/GET_CURRENT_USER"]);
+
 const variablesChat = ref({ chat_id: selectedChat?.value.id });
 
 const { mutate: creatingCall } = useMutation(createCall);
@@ -39,13 +44,14 @@ const { result: currentMessages, loading } = useSubscription(
   getSavedMessagesInThisChat,
   variablesChat
 );
+// const { result: currentIdCalls } = useSubscription(getCurrentIdCalls, {
+//   user_id: window.Clerk.user.id,
+// });
 
 watch(selectedChat, async (value) => {
-  const user = window.Clerk.user;
-
   variablesChat.value.chat_id = value?.id;
 
-  if (user.id === selectedChat.value.sender_id) {
+  if (currentUser.value.id === selectedChat.value.sender_id) {
     calculatedAvatar.value = selectedChat.value.consumer_avatar;
     calculatedFirstName.value = selectedChat.value.consumer_firstName;
   } else {
@@ -56,10 +62,13 @@ watch(selectedChat, async (value) => {
 
 watch(currentCallId, async (value) => {
   if (!value) return;
+
+  console.log("current", currentIdCalls);
+
   let sender,
     consumer = "";
 
-  if (window.Clerk.user.id === selectedChat.value.sender_id) {
+  if (currentUser.value.id === selectedChat.value.sender_id) {
     sender = selectedChat.value.sender_id;
     consumer = selectedChat.value.consumer_id;
   } else {
