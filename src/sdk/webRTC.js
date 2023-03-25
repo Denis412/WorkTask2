@@ -9,6 +9,8 @@ import {
 } from "@firebase/firestore";
 import { db } from "../firebase";
 
+import { useStore } from "vuex";
+
 export default function () {
   const servers = {
     iceServers: [
@@ -21,6 +23,8 @@ export default function () {
     ],
     iceCandidatePoolSize: 10,
   };
+
+  const store = useStore();
 
   const pc = new RTCPeerConnection(servers);
   let localStream = null;
@@ -65,6 +69,8 @@ export default function () {
     const answerCandidates = collection(callDoc, "answerCandidates");
 
     callInput.value = callDoc.id;
+
+    store.commit("chat/CHANGE_CALL", callDoc.id);
 
     pc.onicecandidate = async (event) => {
       event.candidate &&

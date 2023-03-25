@@ -1,5 +1,29 @@
 import gql from "graphql-tag";
 
+export const createCall = gql`
+  mutation createCall(
+    $id: String!
+    $sender_id: String!
+    $consumer_id: String!
+  ) {
+    insert_calls_one(
+      object: { id: $id, sender_id: $sender_id, consumer_id: $consumer_id }
+    ) {
+      id
+    }
+  }
+`;
+
+export const deleteCall = gql`
+  mutation deleteCall($id: String!) {
+    delete_calls_by_pk(id: $id) {
+      id
+      sender_id
+      consumer_id
+    }
+  }
+`;
+
 export const updateUserLastSeen = gql`
   mutation updateUserLastSeen($user_id: String!, $last_seen: timestamptz!) {
     update_users(
