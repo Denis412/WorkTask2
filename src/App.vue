@@ -7,7 +7,7 @@
 
   <q-dialog v-model="showVideoTracks" persistent>
     <q-card style="max-width: 1100px">
-      <VideoStream />
+      <VideoStream :call-id="currentChat?.call_id" />
 
       <q-card-actions align="left">
         <q-btn
@@ -23,7 +23,7 @@
 
 <script setup>
 import { provideApolloClient, useMutation } from "@vue/apollo-composable";
-import { onMounted, provide, ref } from "vue";
+import { onMounted, provide, ref, computed } from "vue";
 import { useStore } from "vuex";
 import { createUser, updateUserLastSeen } from "./graphql-operations/mutations";
 import apolloClient from "./apollo/apollo-client";
@@ -34,6 +34,7 @@ provideApolloClient(apolloClient);
 const store = useStore();
 
 const showVideoTracks = ref(false);
+const currentChat = computed(() => store.getters["chat/GET_CURRENT_CHAT"]);
 
 const { mutate: creatingUser } = useMutation(createUser);
 const { mutate: updatinguserLastSeen } = useMutation(updateUserLastSeen);
@@ -54,7 +55,10 @@ const setToken = async () => {
   );
 };
 
-const setTrueForShowVideoTrack = () => (showVideoTracks.value = true);
+const setTrueForShowVideoTrack = (callId) => {
+  showVideoTracks.value = true;
+  //currentCallId.value = callId;
+};
 
 provide("setTrueForShowVideoTrack", setTrueForShowVideoTrack);
 

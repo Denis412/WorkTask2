@@ -12,24 +12,30 @@
       </span>
     </div>
 
-    <button id="webcamButton">Включить камеру</button>
+    <button id="webcamButton" @click="startWebcam">Включить камеру</button>
 
     <h2>Начать видеозвонок</h2>
-    <button id="callButton" disabled>Создать видеочат (приглашение)</button>
+    <button id="callButton" @click="createCall">
+      Создать видеочат (приглашение)
+    </button>
 
     <h2>Присоединитсья к видеочату</h2>
-    <input id="callInput" />
+    <input id="callInput" :value="callId" />
 
-    <button id="answerButton" disabled>Присоединиться</button>
+    <button id="answerButton" @click="answerCall">Присоединиться</button>
 
     <h2>Сбросить</h2>
-    <button id="hangupButton" disabled>Отключиться</button>
+    <button id="hangupButton" @click="hangup">Отключиться</button>
   </div>
 </template>
 
 <script setup>
-import { onMounted } from "vue";
 import webRTC from "src/sdk/webRTC";
+import { onMounted } from "vue";
+
+const { callId } = defineProps({
+  callId: String,
+});
 
 onMounted(() => {
   webRTC();

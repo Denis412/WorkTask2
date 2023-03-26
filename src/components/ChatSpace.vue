@@ -5,13 +5,18 @@
     </div>
 
     <div v-else>
-      <ChatHeader :title="calculatedFirstName" :avatarUrl="calculatedAvatar" />
+      current: {{ currentCallId }}
+      <ChatHeader
+        :title="calculatedFirstName"
+        :avatarUrl="calculatedAvatar"
+        :selectedChat="selectedChat"
+      />
 
       <div v-if="loading" class="text-center text-h3">
         Загрузка сообщений...
       </div>
 
-      <MessagesList v-else :messages="currentMessages?.messages" />
+      <MessagesList v-else :messages="currentMessages?.chats[0]?.messages" />
     </div>
   </div>
 </template>
@@ -32,7 +37,7 @@ const calculatedAvatar = ref("");
 const calculatedFirstName = ref("");
 
 const selectedChat = computed(() => store.getters["chat/GET_CURRENT_CHAT"]);
-const currentCallId = computed(() => store.getters["chat/GET_CURRENT_CALL"]);
+const currentCallId = ref("");
 const currentUser = computed(() => store.getters["chat/GET_CURRENT_USER"]);
 
 const variablesChat = ref({ chat_id: selectedChat?.value?.id });
@@ -43,7 +48,7 @@ const { result: currentMessages, loading } = useSubscription(
   variablesChat
 );
 
-// const currentChats = inject("currentChats");
+const currentChats = inject("currentChats");
 
 watch(selectedChat, async (value) => {
   variablesChat.value.chat_id = value?.id;
@@ -57,42 +62,41 @@ watch(selectedChat, async (value) => {
   }
 });
 
-watch(currentCallId, async (value) => {
-  if (!value) return;
-
-  // console.log(currentCallId.value);
-  // console.log(selectedChat.value.call_id);
-
-  if (currentCallId.value === selectedChat.value.call_id) {
-    console.log("equal");
-  }
-
-  // store.commit("chat/CHANGE_CALL_ID_IN_CHAT", value);
-
-  let sender,
-    consumer = "";
-
-  if (currentUser.value.id === selectedChat.value.sender_id) {
-    sender = selectedChat.value.sender_id;
-    consumer = selectedChat.value.consumer_id;
-  } else {
-    sender = selectedChat.value.consumer_id;
-    consumer = selectedChat.value.sender_id;
-  }
-
-  // selectedChat.value.call_id = value;
-
-  try {
-    const { data } = await creatingCall({
-      id: selectedChat.value.id,
-      call_id: value,
-    });
-
-    console.log(data);
-  } catch (error) {
-    console.log(error);
-  }
+watch(loading, (value) => {
+  if (!value) currentCallId.value = currentMessages?.value?.chats[0]?.call_id;
 });
+
+// watch(currentCallId, async (value) => {
+//   if (!value) return;
+
+//   if (currentCallId.value === selectedChat.value.call_id) {
+//     console.log("equal");
+//   }
+
+//   let sender,
+//     consumer = "";
+
+//   if (currentUser.value.id === selectedChat.value.sender_id) {
+//     sender = selectedChat.value.sender_id;
+//     consumer = selectedChat.value.consumer_id;
+//   } else {
+//     sender = selectedChat.value.consumer_id;
+//     consumer = selectedChat.value.sender_id;
+//   }
+
+//   // selectedChat.value.call_id = value;
+
+//   try {
+//     const { data } = await creatingCall({
+//       id: selectedChat.value.id,
+//       call_id: value,
+//     });
+
+//     console.log(data);
+//   } catch (error) {
+//     console.log(error);
+//   }
+// });
 </script>
 
 <style lang="scss">
