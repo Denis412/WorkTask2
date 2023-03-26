@@ -7,7 +7,7 @@
 
   <q-dialog v-model="showVideoTracks" persistent>
     <q-card style="max-width: 1100px">
-      <VideoStream :call-id="currentChat?.call_id" />
+      <VideoStream />
 
       <q-card-actions align="left">
         <q-btn

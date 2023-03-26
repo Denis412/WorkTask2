@@ -25,7 +25,7 @@
 
 <script setup>
 import { useSubscription } from "@vue/apollo-composable";
-import { computed, inject, watch } from "vue";
+import { computed, inject } from "vue";
 import { getLastMessageInTheChat } from "../graphql-operations/subscriptions";
 import { calculateTime } from "src/utils/calculateTime";
 import { useStore } from "vuex";
