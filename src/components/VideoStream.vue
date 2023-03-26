@@ -1,39 +1,51 @@
 <template>
   <div class="flex items-center text-center justify-center column">
-    <div>
-      <div class="flex">
-        <q-btn flat @click="startWebcam">Включить камеру</q-btn>
+    <div class="flex justify-end w-100p q-pa-sm">
+      <q-icon
+        class="text-h5 cur-pointer text-negative"
+        name="close"
+        @click="toggleShowVideoTrack"
+      />
+    </div>
 
-        <q-btn flat @click="createCall">Создать новый видеочат</q-btn>
-        <q-btn flat @click="answerCall">Присоединиться к звонку</q-btn>
+    <div class="bg-grey-3">
+      <q-btn flat @click="startWebcam">Включить камеру</q-btn>
+      <q-btn flat @click="createCall">Создать новый видеочат</q-btn>
+      <q-btn flat @click="answerCall">Присоединиться к звонку</q-btn>
+    </div>
 
-        <q-btn flat color="negative" @click="hangup">Отключиться</q-btn>
-      </div>
+    <div class="flex justify-around w-100p">
       <span>
-        <h3>Ваша камера</h3>
+        <h6 class="q-ma-md">Ваша камера</h6>
+
         <video
-          class="rounded-borders"
+          class="video-container bg-grey-5 rounded-borders"
           :srcObject.prop="localStream"
           autoplay
           playsinline
-        ></video>
+        />
       </span>
 
       <span>
-        <h3>Камера собеседника</h3>
+        <h6 class="q-ma-md">Камера собеседника</h6>
+
         <video
-          class="rounded-borders"
+          class="video-container bg-grey-5 rounded-borders"
           :srcObject.prop="remoteStream"
           autoplay
           playsinline
-        ></video>
+        />
       </span>
     </div>
+
+    <q-btn flat class="q-mb-sm" color="negative" @click="hangup"
+      >Отключиться</q-btn
+    >
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, inject } from "vue";
 import { useStore } from "vuex";
 import {
   collection,
@@ -66,6 +78,8 @@ const store = useStore();
 const pc = new RTCPeerConnection(servers);
 const localStream = ref(null);
 const remoteStream = ref(null);
+
+const toggleShowVideoTrack = inject("toggleShowVideoTrack");
 
 const startWebcam = async () => {
   localStream.value = await navigator.mediaDevices.getUserMedia({
@@ -185,3 +199,17 @@ const hangup = async () => {
   pc.close();
 };
 </script>
+
+<style scoped>
+.video-container {
+  width: 250px;
+  height: 187px;
+}
+
+@media (max-width: 320px) {
+  .video-container {
+    width: 187px;
+    height: 140px;
+  }
+}
+</style>

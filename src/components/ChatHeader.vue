@@ -42,13 +42,13 @@ const { title, avatarUrl, selectedChat } = defineProps({
   selectedChat: Object,
 });
 
-const setTrueForShowVideoTrack = inject("setTrueForShowVideoTrack");
+const toggleShowVideoTrack = inject("toggleShowVideoTrack");
 const currentUser = computed(() => store.getters["chat/GET_CURRENT_USER"]);
 
 const { mutate: creatingCall } = useMutation(createCallInChat);
 
 const setCallId = async () => {
-  setTrueForShowVideoTrack();
+  toggleShowVideoTrack();
 
   //console.log(selectedChat.call_id);
   if (selectedChat.call_id) return;

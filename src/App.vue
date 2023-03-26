@@ -8,35 +8,26 @@
   <q-dialog v-model="showVideoTracks" persistent>
     <q-card style="max-width: 1100px">
       <VideoStream />
-
-      <q-card-actions align="left">
-        <q-btn
-          flat
-          label="Выйти из видеочата"
-          color="negative"
-          v-close-popup
-          @click="hangup"
-        />
-      </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
 <script setup>
 import { provideApolloClient, useMutation } from "@vue/apollo-composable";
-import { provide, ref, computed } from "vue";
+import { provide, ref } from "vue";
 import { useStore } from "vuex";
 import { createUser, updateUserLastSeen } from "./graphql-operations/mutations";
 import apolloClient from "./apollo/apollo-client";
 import VideoStream from "./components/VideoStream.vue";
-//import webRTCApi from "./sdk/RTC";
 
 provideApolloClient(apolloClient);
 
 const store = useStore();
 
 const showVideoTracks = ref(false);
-const currentChat = computed(() => store.getters["chat/GET_CURRENT_CHAT"]);
+
+const publishableKey =
+  "pk_test_c3Ryb25nLWNhbWVsLTQzLmNsZXJrLmFjY291bnRzLmRldiQ";
 
 const { mutate: creatingUser } = useMutation(createUser);
 const { mutate: updatinguserLastSeen } = useMutation(updateUserLastSeen);
@@ -57,18 +48,11 @@ const setToken = async () => {
   );
 };
 
-const setTrueForShowVideoTrack = () => {
-  showVideoTracks.value = true;
+const toggleShowVideoTrack = () => {
+  showVideoTracks.value = !showVideoTracks.value;
 };
 
-const hangup = () => {
-  //webRTCApi.hangup();
-};
-
-provide("setTrueForShowVideoTrack", setTrueForShowVideoTrack);
-
-const publishableKey =
-  "pk_test_c3Ryb25nLWNhbWVsLTQzLmNsZXJrLmFjY291bnRzLmRldiQ";
+provide("toggleShowVideoTrack", toggleShowVideoTrack);
 
 const startClerk = async () => {
   const Clerk = window.Clerk;
