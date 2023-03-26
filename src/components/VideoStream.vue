@@ -97,13 +97,11 @@ const createCall = async () => {
       id: currentChat.value.id,
       call_id: callDoc.id,
     });
-
-    console.log(data);
   } catch (error) {
     console.log(error);
   }
 
-  store.commit("chat/CHANGE_CALL", callDoc.id);
+  //store.commit("chat/CHANGE_CALL", callDoc.id);
 
   pc.onicecandidate = async (event) => {
     event.candidate &&
@@ -167,7 +165,6 @@ const answerCall = async () => {
 
   onSnapshot(offerCandidates, (snapshot) => {
     snapshot.docChanges().forEach((change) => {
-      console.log(change);
       if (change.type === "added") {
         let data = change.doc.data();
         pc.addIceCandidate(new RTCIceCandidate(data));
@@ -176,8 +173,14 @@ const answerCall = async () => {
   });
 };
 
-const hangup = () => {
-  store.commit("chat/CHANGE_CALL", null);
+const hangup = async () => {
+  store.commit("chat/CHANGE_CALL_ID_IN_CHAT", null);
+
+  // localStream.value = navigator.mediaDevices.getUserMedia({});
+
+  localStream.value.getVideoTracks()[0].enabled = false;
+  // Отключение звука
+  localStream.value.getAudioTracks()[0].enabled = false;
 
   pc.close();
 };

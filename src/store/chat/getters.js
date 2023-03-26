@@ -9,7 +9,3 @@ export function GET_CURRENT_USER(state) {
 export function GET_CURRENT_CHATS(state) {
   return state.currentChats;
 }
-
-export function GET_CURRENT_CALL(state) {
-  return state.currentCallId;
-}

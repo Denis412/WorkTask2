@@ -3,6 +3,5 @@ export default function () {
     currentUser: null,
     currentChats: [],
     selectedChat: null,
-    currentCallId: "",
   };
 }

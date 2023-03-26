@@ -12,9 +12,10 @@
       <q-card-actions align="left">
         <q-btn
           flat
-          label="Выйти из видео чата"
+          label="Выйти из видеочата"
           color="negative"
           v-close-popup
+          @click="hangup"
         />
       </q-card-actions>
     </q-card>
@@ -23,11 +24,12 @@
 
 <script setup>
 import { provideApolloClient, useMutation } from "@vue/apollo-composable";
-import { onMounted, provide, ref, computed } from "vue";
+import { provide, ref, computed } from "vue";
 import { useStore } from "vuex";
 import { createUser, updateUserLastSeen } from "./graphql-operations/mutations";
 import apolloClient from "./apollo/apollo-client";
 import VideoStream from "./components/VideoStream.vue";
+//import webRTCApi from "./sdk/RTC";
 
 provideApolloClient(apolloClient);
 
@@ -55,9 +57,12 @@ const setToken = async () => {
   );
 };
 
-const setTrueForShowVideoTrack = (callId) => {
+const setTrueForShowVideoTrack = () => {
   showVideoTracks.value = true;
-  //currentCallId.value = callId;
+};
+
+const hangup = () => {
+  //webRTCApi.hangup();
 };
 
 provide("setTrueForShowVideoTrack", setTrueForShowVideoTrack);

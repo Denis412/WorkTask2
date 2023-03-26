@@ -32,6 +32,7 @@ import { computed, inject } from "vue";
 import { useStore } from "vuex";
 import { useMutation } from "@vue/apollo-composable";
 import { createCallInChat } from "src/graphql-operations/mutations";
+//import webRTCApi from "../sdk/RTC";
 
 const store = useStore();
 
@@ -49,7 +50,7 @@ const { mutate: creatingCall } = useMutation(createCallInChat);
 const setCallId = async () => {
   setTrueForShowVideoTrack();
 
-  console.log(selectedChat.call_id);
+  //console.log(selectedChat.call_id);
   if (selectedChat.call_id) return;
 
   let sender,
@@ -61,17 +62,6 @@ const setCallId = async () => {
   } else {
     sender = selectedChat.consumer_id;
     consumer = selectedChat.sender_id;
-  }
-
-  try {
-    const { data } = await creatingCall({
-      id: selectedChat.id,
-      call_id: value,
-    });
-
-    console.log(data);
-  } catch (error) {
-    console.log(error);
   }
 };
 </script>
