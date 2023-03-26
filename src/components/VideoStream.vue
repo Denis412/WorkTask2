@@ -107,15 +107,13 @@ const createCall = async () => {
   store.commit("chat/CHANGE_CALL_ID_IN_CHAT", callDoc.id);
 
   try {
-    const { data } = await creatingCall({
+    await creatingCall({
       id: currentChat.value.id,
       call_id: callDoc.id,
     });
   } catch (error) {
     console.log(error);
   }
-
-  //store.commit("chat/CHANGE_CALL", callDoc.id);
 
   pc.onicecandidate = async (event) => {
     event.candidate &&
@@ -190,10 +188,7 @@ const answerCall = async () => {
 const hangup = async () => {
   store.commit("chat/CHANGE_CALL_ID_IN_CHAT", null);
 
-  // localStream.value = navigator.mediaDevices.getUserMedia({});
-
   localStream.value.getVideoTracks()[0].enabled = false;
-  // Отключение звука
   localStream.value.getAudioTracks()[0].enabled = false;
 
   pc.close();
