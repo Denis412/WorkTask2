@@ -81,17 +81,27 @@ const toggleRightDrawer = () => {
   rightDrawerOpen.value = !rightDrawerOpen.value;
 };
 
-const selectChat = (id) => {
-  store.commit("chat/CHANGE_CHAT", id);
+const selectChat = (chat) => {
+  store.commit("chat/CHANGE_CHAT", chat);
 };
 
-provide("user", user);
 provide("selectChat", selectChat);
 provide("toggleLeftDrawer", toggleLeftDrawer);
 provide("toggleRightDrawer", toggleRightDrawer);
 
 watch(user, (value) => {
   variables.value.user_id = value?.id;
+});
+
+watch(chats, (value) => {
+  store.commit("chat/SET_CURRENT_CHATS", value);
+
+  const newChat = value?.chats?.find(
+    (chat) => chat.id === selectedChat.value?.id
+  );
+
+  if (newChat?.call_id)
+    store.commit("chat/CHANGE_CALL_ID_IN_CHAT", newChat.call_id);
 });
 
 watch(selectedChat, (value) => {

@@ -5,13 +5,17 @@
     </div>
 
     <div v-else>
-      <ChatHeader :title="calculatedFirstName" :avatarUrl="calculatedAvatar" />
+      <ChatHeader
+        :title="calculatedFirstName"
+        :avatarUrl="calculatedAvatar"
+        :selectedChat="selectedChat"
+      />
 
       <div v-if="loading" class="text-center text-h3">
         Загрузка сообщений...
       </div>
 
-      <MessagesList v-else :messages="currentMessages?.messages" />
+      <MessagesList v-else :messages="currentMessages?.chats[0]?.messages" />
     </div>
   </div>
 </template>
@@ -30,7 +34,10 @@ const calculatedAvatar = ref("");
 const calculatedFirstName = ref("");
 
 const selectedChat = computed(() => store.getters["chat/GET_CURRENT_CHAT"]);
-const variablesChat = ref({ chat_id: selectedChat?.value.id });
+const currentCallId = ref("");
+const currentUser = computed(() => store.getters["chat/GET_CURRENT_USER"]);
+
+const variablesChat = ref({ chat_id: selectedChat?.value?.id });
 
 const { result: currentMessages, loading } = useSubscription(
   getSavedMessagesInThisChat,
@@ -38,17 +45,19 @@ const { result: currentMessages, loading } = useSubscription(
 );
 
 watch(selectedChat, async (value) => {
-  const user = window.Clerk.user;
-
   variablesChat.value.chat_id = value?.id;
 
-  if (user.id === selectedChat.value.sender_id) {
+  if (currentUser.value.id === selectedChat.value.sender_id) {
     calculatedAvatar.value = selectedChat.value.consumer_avatar;
     calculatedFirstName.value = selectedChat.value.consumer_firstName;
   } else {
     calculatedAvatar.value = selectedChat.value.sender_avatar;
     calculatedFirstName.value = selectedChat.value.sender_firstName;
   }
+});
+
+watch(loading, (value) => {
+  if (!value) currentCallId.value = currentMessages?.value?.chats[0]?.call_id;
 });
 </script>
 

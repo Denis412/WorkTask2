@@ -39,11 +39,14 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useMutation, useSubscription } from "@vue/apollo-composable";
 import { createChat } from "../graphql-operations/mutations";
 import { getUserById } from "../graphql-operations/subscriptions";
 import { useQuasar } from "quasar";
+import { useStore } from "vuex";
+
+const store = useStore();
 
 const $q = useQuasar();
 const { result: user } = useSubscription(getUserById, {
@@ -55,6 +58,7 @@ const { currentUser } = defineProps({
 });
 
 const showDialogWindow = ref(false);
+const currentAuthUser = computed(() => store.getters["chat/GET_CURRENT_USER"]);
 
 const { mutate: creatingChat } = useMutation(createChat);
 
@@ -69,7 +73,7 @@ const setStatus = () => {
 };
 
 const sendChat = async () => {
-  if (!window.Clerk?.user) {
+  if (!currentAuthUser.value) {
     $q.notify({
       type: "negative",
       position: "top",
@@ -78,9 +82,7 @@ const sendChat = async () => {
     return;
   }
 
-  const user = window.Clerk?.user;
-
-  if (currentUser.id === user.id) {
+  if (currentUser.id === currentAuthUser.value.id) {
     $q.notify({
       type: "warning",
       position: "top",
@@ -91,10 +93,10 @@ const sendChat = async () => {
 
   try {
     await creatingChat({
-      sender_id: user.id,
+      sender_id: currentAuthUser.value.id,
       consumer_id: currentUser.id,
-      sender_avatar: user.profileImageUrl,
-      sender_firstName: user.firstName,
+      sender_avatar: currentAuthUser.value.profileImageUrl,
+      sender_firstName: currentAuthUser.value.firstName,
       consumer_avatar: currentUser.avatar_url,
       consumer_firstName: currentUser.first_name,
     });

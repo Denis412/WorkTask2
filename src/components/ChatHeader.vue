@@ -7,14 +7,17 @@
       <div>
         <q-img class="q-ml-md avatar-min-size" :src="avatarUrl" />
       </div>
+      <!-- call: {{ callId }} -->
 
       <span class="q-ml-md text-h5">{{ title }}</span>
 
       <q-icon
         class="q-mx-md text-h5 text-primary cur-pointer"
         name="videocam"
-        @click="setTrueForShowVideoTrack"
+        @click="setCallId"
       />
+
+      <!-- call: {{ selectedChat?.call_id }} sel: {{ selectedChat }} -->
     </div>
 
     <q-icon
@@ -25,12 +28,40 @@
 </template>
 
 <script setup>
-import { inject, ref } from "vue";
+import { computed, inject } from "vue";
+import { useStore } from "vuex";
+import { useMutation } from "@vue/apollo-composable";
+import { createCallInChat } from "src/graphql-operations/mutations";
+//import webRTCApi from "../sdk/RTC";
 
-const { title, avatarUrl } = defineProps({
+const store = useStore();
+
+const { title, avatarUrl, selectedChat } = defineProps({
   title: String,
   avatarUrl: String,
+  selectedChat: Object,
 });
 
-const setTrueForShowVideoTrack = inject("setTrueForShowVideoTrack");
+const toggleShowVideoTrack = inject("toggleShowVideoTrack");
+const currentUser = computed(() => store.getters["chat/GET_CURRENT_USER"]);
+
+const { mutate: creatingCall } = useMutation(createCallInChat);
+
+const setCallId = async () => {
+  toggleShowVideoTrack();
+
+  //console.log(selectedChat.call_id);
+  if (selectedChat.call_id) return;
+
+  let sender,
+    consumer = "";
+
+  if (currentUser.value.id === selectedChat.sender_id) {
+    sender = selectedChat.sender_id;
+    consumer = selectedChat.consumer_id;
+  } else {
+    sender = selectedChat.consumer_id;
+    consumer = selectedChat.sender_id;
+  }
+};
 </script>

@@ -16,8 +16,11 @@
 
 <script setup>
 import { useMutation } from "@vue/apollo-composable";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { createMessage } from "../graphql-operations/mutations";
+import { useStore } from "vuex";
+
+const store = useStore();
 
 const { selectedChat, messagePush, variables } = defineProps({
   selectedChat: Object,
@@ -25,23 +28,23 @@ const { selectedChat, messagePush, variables } = defineProps({
   messagePush: Function,
 });
 
+const currentUser = computed(() => store.getters["chat/GET_CURRENT_USER"]);
+
 const { mutate: createdMessage } = useMutation(createMessage);
 
 const message = ref("");
 
 const sendMessage = async () => {
-  const user = window.Clerk.user;
-
   const currentConsumerId =
-    user.id === selectedChat.sender_id
+    currentUser.value.id === selectedChat.sender_id
       ? selectedChat.consumer_id
       : selectedChat.sender_id;
 
   const currentMessage = {
-    senderId: user.id,
+    senderId: currentUser.value.id,
     consumerId: currentConsumerId,
-    senderDisplayName: user.firstName,
-    senderAvatarUrl: user.profileImageUrl,
+    senderDisplayName: currentUser.value.firstName,
+    senderAvatarUrl: currentUser.value.profileImageUrl,
     content: message.value,
     created_at: Date.now(),
     chat_id: variables.chat_id,

@@ -1,5 +1,20 @@
 import gql from "graphql-tag";
 
+export const getCurrentIdCalls = gql`
+  subscription getCurrentIdCalls($user_id: String!) {
+    calls(
+      where: {
+        _or: [
+          { consumer_id: { _eq: $user_id } }
+          { sender_id: { _eq: $user_id } }
+        ]
+      }
+    ) {
+      id
+    }
+  }
+`;
+
 export const getUserById = gql`
   subscription getUsers($id: String!) {
     users(where: { id: { _eq: $id } }) {
@@ -41,6 +56,7 @@ export const getAllChatsForCurrentUser = gql`
       consumer_avatar
       sender_firstName
       sender_avatar
+      call_id
     }
   }
 `;
@@ -64,17 +80,17 @@ export const getLastMessageInTheChat = gql`
 
 export const getSavedMessagesInThisChat = gql`
   subscription getSavedMessagesInThisChat($chat_id: Int) {
-    messages(
-      where: { chat_id: { _eq: $chat_id } }
-      order_by: { created_at: asc }
-    ) {
-      id
-      senderId
-      senderDisplayName
-      senderAvatarUrl
-      created_at
-      content
-      consumerId
+    chats(where: { id: { _eq: $chat_id } }) {
+      messages(order_by: { created_at: asc }) {
+        id
+        senderId
+        senderDisplayName
+        senderAvatarUrl
+        created_at
+        content
+        consumerId
+      }
+      call_id
     }
   }
 `;
