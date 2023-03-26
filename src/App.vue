@@ -8,29 +8,26 @@
   <q-dialog v-model="showVideoTracks" persistent>
     <q-card style="max-width: 1100px">
       <VideoStream />
-
-      <q-card-actions align="left">
-        <q-btn
-          flat
-          label="Выйти из видео чата"
-          color="negative"
-          v-close-popup
-        />
-      </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
 <script setup>
 import { provideApolloClient, useMutation } from "@vue/apollo-composable";
-import { onMounted, provide, ref } from "vue";
+import { provide, ref } from "vue";
+import { useStore } from "vuex";
 import { createUser, updateUserLastSeen } from "./graphql-operations/mutations";
 import apolloClient from "./apollo/apollo-client";
 import VideoStream from "./components/VideoStream.vue";
 
 provideApolloClient(apolloClient);
 
+const store = useStore();
+
 const showVideoTracks = ref(false);
+
+const publishableKey =
+  "pk_test_c3Ryb25nLWNhbWVsLTQzLmNsZXJrLmFjY291bnRzLmRldiQ";
 
 const { mutate: creatingUser } = useMutation(createUser);
 const { mutate: updatinguserLastSeen } = useMutation(updateUserLastSeen);
@@ -51,12 +48,11 @@ const setToken = async () => {
   );
 };
 
-const setTrueForShowVideoTrack = () => (showVideoTracks.value = true);
+const toggleShowVideoTrack = () => {
+  showVideoTracks.value = !showVideoTracks.value;
+};
 
-provide("setTrueForShowVideoTrack", setTrueForShowVideoTrack);
-
-const publishableKey =
-  "pk_test_c3Ryb25nLWNhbWVsLTQzLmNsZXJrLmFjY291bnRzLmRldiQ";
+provide("toggleShowVideoTrack", toggleShowVideoTrack);
 
 const startClerk = async () => {
   const Clerk = window.Clerk;
@@ -74,6 +70,8 @@ const startClerk = async () => {
     if (Clerk.user) {
       Clerk.mountUserButton(userButton);
       userButton.style.margin = "auto";
+
+      store.commit("chat/SET_CURRENT_USER", Clerk.user);
 
       setToken();
       const timerSetToken = setInterval(async () => {

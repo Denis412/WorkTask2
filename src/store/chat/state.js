@@ -1,5 +1,7 @@
 export default function () {
   return {
-    selectedChat: 0,
+    currentUser: null,
+    currentChats: [],
+    selectedChat: null,
   };
 }

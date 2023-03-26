@@ -1,5 +1,13 @@
 import gql from "graphql-tag";
 
+export const createCallInChat = gql`
+  mutation createCallInChat($id: Int!, $call_id: String!) {
+    update_chats_by_pk(pk_columns: { id: $id }, _set: { call_id: $call_id }) {
+      id
+    }
+  }
+`;
+
 export const updateUserLastSeen = gql`
   mutation updateUserLastSeen($user_id: String!, $last_seen: timestamptz!) {
     update_users(

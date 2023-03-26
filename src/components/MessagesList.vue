@@ -17,14 +17,19 @@
 </template>
 
 <script setup>
-import userApi from "src/sdk/user";
 import { calculateTime } from "src/utils/calculateTime";
+import { computed } from "vue";
+import { useStore } from "vuex";
+
+const store = useStore();
 
 const { messages } = defineProps({
   messages: Array,
 });
 
-const checkSender = (user_id) => userApi.get()?.id === user_id;
+const currentUser = computed(() => store.getters["chat/GET_CURRENT_USER"]);
+
+const checkSender = (user_id) => currentUser.value?.id === user_id;
 </script>
 
 <style scoped>

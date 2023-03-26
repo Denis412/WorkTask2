@@ -1,5 +1,20 @@
 import gql from "graphql-tag";
 
+export const getCurrentIdCalls = gql`
+  query getCurrentIdCalls($user_id: String!) {
+    calls(
+      where: {
+        _or: [
+          { consumer_id: { _eq: $user_id } }
+          { sender_id: { _eq: $user_id } }
+        ]
+      }
+    ) {
+      id
+    }
+  }
+`;
+
 export const getUsersLastSeen = gql`
   query getUsersLastSeen($last_seen: timestamptz) {
     users(where: { last_seen: { _gte: $last_seen } }) {
